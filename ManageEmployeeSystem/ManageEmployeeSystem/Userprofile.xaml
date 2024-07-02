@@ -87,7 +87,7 @@
         <Label Grid.Row="10" Grid.Column="2" Grid.ColumnSpan="2" FontSize="20" FontWeight="DemiBold">Thông tin đăng nhập:</Label>
         <Label Grid.Row="11" Grid.Column="2" FontSize="20">Tài khoản:</Label>
         <TextBox Grid.Row="11" Grid.Column="3" FontSize="20" IsReadOnly="True" Margin="17,5,18,5" Name="txtUsername"/>
-        <Label Grid.Row="12" Grid.Column="2" FontSize="20">Mật khẩu cũ</Label>
+        <Label Grid.Row="12" Grid.Column="2" FontSize="20">Mật khẩu cũ:</Label>
         <PasswordBox Grid.Row="12" Grid.Column="3" FontSize="20" Margin="17,5,18,5" Name="txtOldpassword"/>
         <Label Grid.Row="13" Grid.Column="2" FontSize="20">Mật khẩu mới:</Label>
         <PasswordBox Grid.Row="13" Grid.Column="3" FontSize="20" Margin="17,5,18,5" Name="txtNewpassword"/>

@@ -34,7 +34,7 @@
             <RowDefinition Height="45"/>
             <RowDefinition Height="45"/>
         </Grid.RowDefinitions>
-        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" HorizontalAlignment="Center" FontSize="25" FontWeight="Bold" >Quản lí công việc</Label>
+        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" HorizontalAlignment="Center" FontSize="25" FontWeight="Bold" >Quản lý công việc</Label>
         <StackPanel Orientation="Horizontal" Grid.Column="3" Grid.Row="0" HorizontalAlignment="Right" Margin="0,0,10,0">
             <Button Content="Trang chủ" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0" Click="GoHome_Click"/>
             <Button Content="Đăng xuất" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0" Click="Logout_Click" />
@@ -44,7 +44,7 @@
         <DataGrid Name="dgEmployeeJobs" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Grid.RowSpan="6" FontSize="15" >
         </DataGrid>
         <StackPanel Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="4" Orientation="Horizontal" Margin="110,0,0,0">
-            <Label Margin="10,5,10,5" FontSize="15">Tìm kiếm:</Label>
+            <Label Margin="10,5,10,5" FontSize="15">Tìm kiếm theo:</Label>
             <ComboBox Name="cbbFilter" Width="150" Height="30" Margin="10,5,10,5" FontSize="15">
                 <ComboBoxItem Content="ID nhân viên"/>
                 <ComboBoxItem Content="Tên công việc"/>
@@ -72,19 +72,21 @@
         <TextBox Name="txtDesription" Grid.Row="12" Grid.Column="1" Height="30" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.Description, Mode=OneWay}"/>
 
         <Label Grid.Row="13" Grid.Column="0" FontSize="20">Trạng thái:</Label>
-        <TextBox Name="txtStatus" Grid.Row="13" Grid.Column="1" Height="30" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.Status, Mode=OneWay}"/>
+        <!--<TextBox Name="txtStatus" Grid.Row="13" Grid.Column="1" Height="30" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.Status, Mode=OneWay}"/>-->
+        <ComboBox Name="cbbStatus" Grid.Row="13" Grid.Column="1" Height="30" FontSize="15" Margin="10,0,10,0" Width="462" Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.Status, Mode=OneWay}"></ComboBox>
 
-        
+
         <!--<TextBox Name="txtEmployee" Grid.Row="14" Grid.Column="1" Height="30" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.EmployeeName, Mode=OneWay}"/>-->
 
         <Label Grid.Row="10" Grid.Column="2" FontSize="20">Người giao việc:</Label>
-        <TextBox Name="txtAssignBy" Grid.Row="10" Grid.Column="3" Height="30" FontSize="15" Margin="10,0,10,0"  Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.AssignBy, Mode=OneWay}"/>
-       
+        <!--<TextBox Name="txtAssignBy" Grid.Row="10" Grid.Column="3" Height="30" FontSize="15" Margin="10,0,10,0"  Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.AssignBy, Mode=OneWay}"/>-->
+        <ComboBox Name="cbbSelectAssign" Grid.Row="10" Grid.Column="3" Height="30" Width="462"  FontSize="15"  Margin="10,0,10,0" Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.AssignBy, Mode=OneWay}" ></ComboBox>
+
 
         <Label Grid.Row="11" Grid.Column="2" FontSize="20">Nhân viên phụ trách:</Label>
         <StackPanel Grid.Row="11" Grid.Column="3" Orientation="Horizontal">
             <!--<TextBox Name="txtEmployee" Grid.Row="10" Grid.Column="3" Height="30" FontSize="15" Margin="10,0,10,0" Width="290" Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.EmployeeName, Mode=OneWay}"/>-->
-            <ComboBox Name="cbbSelectEmployee" Width="462" Height="30" Margin="10,0,10,0" FontSize="15" SelectionChanged="cbbSelectEmployee_SelectionChanged" Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.EmployeeName, Mode=OneWay}" ></ComboBox>
+            <ComboBox Name="cbbSelectEmployee" Width="462" Height="30" Margin="10,0,10,0" FontSize="15" Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.EmployeeName, Mode=OneWay}" ></ComboBox>
         </StackPanel>
         
 
@@ -103,7 +105,8 @@
         <StackPanel Grid.Row="15" Grid.Column="2" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="Cập nhật" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0"/>
             <Button Content="Thêm" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0"/>
-            <Button Content="Xóa" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0"/>
+            <Button Content="Xóa" Width="100" Height="30"  FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0"/>
+            <Button Content="Làm mới" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0" Click="Clear_Click" />
         </StackPanel>
 
     </Grid>

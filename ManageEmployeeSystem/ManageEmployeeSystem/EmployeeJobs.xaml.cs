@@ -33,21 +33,19 @@ namespace ManageEmployeeSystem
             InitializeComponent();
             em = employee;
             this.Title = "Hello " + employee.FirstName + " " + employee.LastName;
-
+            LoadAssignBy();
             LoadDataJobStatus();
             LoadEmployee();
             if (em != null)
             {
-                if (em.RoleId == 2) //nhân viên
+                if (em.RoleId == 2)
                 {
-                    LoadIndiJobs();
+                    LoadIndiJobs();             
                     cbAllJob.Visibility = Visibility.Visible;
                 }
-                if (em.RoleId == 3) //quản lí
+                if (em.RoleId == 3) 
                 {
                     LoadDataJobs();
-                    //btnAllWork.Visibility = Visibility.Visible;
-                    //btnIndiWork.Visibility = Visibility.Visible;
                     cbAllJob.Visibility = Visibility.Visible;
                     cbIndiJob.Visibility = Visibility.Visible;
                 }
@@ -56,7 +54,7 @@ namespace ManageEmployeeSystem
 
         private void LoadEmployee()
         {
-            if (em.RoleId == 2) //nhân viên
+            if (em.RoleId == 2) 
             {
                 var employeedata = database.Employees.Where(e => e.Id == em.Id && e.DepartmentId == em.DepartmentId).Select(e => new
                 {
@@ -67,7 +65,7 @@ namespace ManageEmployeeSystem
                 cbbSelectEmployee.DisplayMemberPath = "FullName";
                 cbbSelectEmployee.SelectedValuePath = "ID";
             }
-            if (em.RoleId == 3) //quản lí
+            if (em.RoleId == 3)
             {
                 var employeedata = database.Employees.Where(e => e.DepartmentId == em.DepartmentId).Select(e => new
                 {
@@ -78,7 +76,18 @@ namespace ManageEmployeeSystem
                 cbbSelectEmployee.DisplayMemberPath = "FullName";
                 cbbSelectEmployee.SelectedValuePath = "ID";
             }
+        }
 
+        private void LoadAssignBy()
+        {
+            var employeedata = database.Employees.Where(e => e.Id == em.Id && e.DepartmentId == em.DepartmentId).Select(e => new
+            {
+                ID = e.Id,
+                FullName = $"{e.FirstName} {e.LastName}"
+            }).ToList();
+            cbbSelectAssign.ItemsSource = employeedata;
+            cbbSelectAssign.DisplayMemberPath = "FullName";
+            cbbSelectAssign.SelectedValuePath = "ID";
         }
 
         private void LoadDataJobs()
@@ -122,7 +131,9 @@ namespace ManageEmployeeSystem
             cbbFilterJobStatus.ItemsSource = jobStatus.ToList();
             cbbFilterJobStatus.DisplayMemberPath = "Name";
             cbbFilterJobStatus.SelectedValuePath = "ID";
-
+            cbbStatus.ItemsSource = jobStatus.ToList();
+            cbbStatus.DisplayMemberPath = "Name";
+            cbbStatus.SelectedValuePath = "ID";
         }
 
         private void dgEmployeeJobs_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -295,14 +306,17 @@ namespace ManageEmployeeSystem
             cbbFilterJobStatus.SelectedIndex = -1;
         }
 
-        private void cbbSelectEmployee_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void Clear_Click(object sender, RoutedEventArgs e)
         {
-            var employeeId = cbbSelectEmployee.SelectedIndex + 1;
-            var employee = database.Employees.Where(e => e.Id == employeeId).Select(e => new
-            {
-                Name = e.FirstName + " " + e.LastName,
-            }).FirstOrDefault();
-            //txtEmployee.Text = employee.Name.ToString();
+            txtJobID.Text = string.Empty;
+            txtJobName.Text = string.Empty;
+            txtDesription.Text = string.Empty;
+            txtEndDate.Text = string.Empty;
+            txtStartDate.Text = string.Empty;
+            cbbStatus.Text = string.Empty;
+            cbbSelectAssign.Text = string.Empty;
+            txtAssignDate.Text = string.Empty;
+            cbbSelectEmployee.Text = string.Empty;
         }
     }
 }
