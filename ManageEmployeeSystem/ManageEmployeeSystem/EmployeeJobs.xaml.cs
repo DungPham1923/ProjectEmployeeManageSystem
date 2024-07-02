@@ -33,28 +33,29 @@ namespace ManageEmployeeSystem
             InitializeComponent();
             em = employee;
             this.Title = "Hello " + employee.FirstName + " " + employee.LastName;
-            LoadAssignBy();
-            LoadDataJobStatus();
-            LoadEmployee();
+
             if (em != null)
             {
                 if (em.RoleId == 2)
                 {
-                    LoadIndiJobs();             
+                    LoadIndiJobs();
                     cbAllJob.Visibility = Visibility.Visible;
                 }
-                if (em.RoleId == 3) 
+                if (em.RoleId == 3)
                 {
                     LoadDataJobs();
                     cbAllJob.Visibility = Visibility.Visible;
                     cbIndiJob.Visibility = Visibility.Visible;
                 }
             }
+            LoadDataJobStatus();
+            LoadEmployee();
+            LoadAssignBy();
         }
 
         private void LoadEmployee()
         {
-            if (em.RoleId == 2) 
+            if (em.RoleId == 2)
             {
                 var employeedata = database.Employees.Where(e => e.Id == em.Id && e.DepartmentId == em.DepartmentId).Select(e => new
                 {
@@ -80,14 +81,18 @@ namespace ManageEmployeeSystem
 
         private void LoadAssignBy()
         {
-            var employeedata = database.Employees.Where(e => e.Id == em.Id && e.DepartmentId == em.DepartmentId).Select(e => new
+            if (em.RoleId == 2 || em.RoleId == 3)
             {
-                ID = e.Id,
-                FullName = $"{e.FirstName} {e.LastName}"
-            }).ToList();
-            cbbSelectAssign.ItemsSource = employeedata;
-            cbbSelectAssign.DisplayMemberPath = "FullName";
-            cbbSelectAssign.SelectedValuePath = "ID";
+                var employeedata = database.Employees.Where(e => e.Id == em.Id && e.DepartmentId == em.DepartmentId).Select(e => new
+                {
+                    ID = e.Id,
+                    FullName = $"{e.FirstName} {e.LastName}"
+                }).ToList();
+                cbbSelectAssign.ItemsSource = employeedata;
+                cbbSelectAssign.DisplayMemberPath = "FullName";
+                cbbSelectAssign.SelectedValuePath = "ID";
+            }
+
         }
 
         private void LoadDataJobs()
