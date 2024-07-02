@@ -1,0 +1,39 @@
+﻿<Window x:Class="ManageEmployeeSystem.Home"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ManageEmployeeSystem"
+        mc:Ignorable="d"
+        WindowState="Maximized"
+        WindowStyle="ToolWindow"
+        Title="Home" Height="800" Width="1450">
+    <Grid>
+        <StackPanel HorizontalAlignment="Center" Width="700" Margin="0,30,0,0">
+            <Label FontSize="25" FontWeight="Bold" HorizontalAlignment="Center">Trang chủ</Label>
+            <WrapPanel HorizontalAlignment="Center">
+                <StackPanel Name="userFunc" Visibility="Collapsed">
+                    <Button Width="200" Height="30" Margin="10" Content="Thông tin cá nhân" Click="ProfileDetail_Click" />
+                    <Button Width="200" Height="30" Margin="10" Content="Quản lí công việc" Click="EmployeeJobs_Click" />
+                </StackPanel>
+                <StackPanel Name="manageFunc" Visibility="Collapsed">
+                    <Button Width="200" Height="30" Margin="10" Content="Thông tin cá nhân" Click="ProfileDetail_Click" />
+                    <Button Width="200" Height="30" Margin="10" Content="Thông tin phòng ban" Click="Department_Click" />
+                    <Button Width="200" Height="30" Margin="10" Content="Quản lí công việc" Click="EmployeeJobs_Click" />
+                </StackPanel>
+                <StackPanel Name="adminFunc" Visibility="Collapsed">
+                    <Button Width="200" Height="30" Margin="10" Content="Thông tin cá nhân" Click="ProfileDetail_Click" />
+                    <Button Width="200" Height="30" Margin="10" Content="Danh sách phòng ban"/>
+                    <Button Width="200" Height="30" Margin="10" Content="Dánh sách trưởng phòng"/>
+                    <Button Width="200" Height="30" Margin="10" Content="Danh sách nhân viên"/>
+                    <Button Width="200" Height="30" Margin="10" Content="Danh sách công việc"/>
+                </StackPanel>
+            </WrapPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="40">
+                <Button Content="Quay lại" Width="100" Height="30" Margin="10" HorizontalAlignment="Right" Click="Back_Click"/>
+                <Button Content="Đăng xuất" Width="100" Height="30" Margin="10" HorizontalAlignment="Right" Click="Logout_Click"/>
+            </StackPanel>
+        </StackPanel>
+        <Frame x:Name="HomeBack" NavigationUIVisibility="Hidden"/>
+    </Grid>
+</Window>
