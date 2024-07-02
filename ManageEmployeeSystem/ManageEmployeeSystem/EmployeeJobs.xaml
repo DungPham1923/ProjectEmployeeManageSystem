@@ -41,7 +41,7 @@
         </StackPanel>
 
         <Label Grid.Row="1" Grid.Column="0" FontSize="20" FontWeight="DemiBold">Danh sách công việc:</Label>
-        <DataGrid Name="dgEmployeeJobs" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Grid.RowSpan="6" FontSize="15" >
+        <DataGrid Name="dgEmployeeJobs" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Grid.RowSpan="6" FontSize="15">
         </DataGrid>
         <StackPanel Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="4" Orientation="Horizontal" Margin="110,0,0,0">
             <Label Margin="10,5,10,5" FontSize="15">Tìm kiếm theo:</Label>
@@ -80,12 +80,17 @@
 
         <Label Grid.Row="10" Grid.Column="2" FontSize="20">Người giao việc:</Label>
         <!--<TextBox Name="txtAssignBy" Grid.Row="10" Grid.Column="3" Height="30" FontSize="15" Margin="10,0,10,0"  Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.AssignBy, Mode=OneWay}"/>-->
-        <ComboBox Name="cbbSelectAssign" Grid.Row="10" Grid.Column="3" Height="30" Width="462" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.AssignBy, Mode=OneWay}" ></ComboBox>
+        <ComboBox Name="cbbSelectAssign" Grid.Row="10" Grid.Column="3" Height="30" Width="462" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.AssignBy, Mode=OneWay}"></ComboBox>
+
+
+
+
+
 
         <Label Grid.Row="11" Grid.Column="2" FontSize="20">Nhân viên phụ trách:</Label>
         <StackPanel Grid.Row="11" Grid.Column="3" Orientation="Horizontal">
             <!--<TextBox Name="txtEmployee" Grid.Row="10" Grid.Column="3" Height="30" FontSize="15" Margin="10,0,10,0" Width="290" Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.EmployeeName, Mode=OneWay}"/>-->
-            <ComboBox Name="cbbSelectEmployee" Width="462" Height="30" Margin="10,0,10,0" FontSize="15" Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.EmployeeName, Mode=OneWay}" ></ComboBox>
+            <ComboBox Name="cbbSelectEmployee" Width="462" Height="30" Margin="10,0,10,0" FontSize="15" Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.EmployeeName, Mode=OneWay}"></ComboBox>
         </StackPanel>
         
 

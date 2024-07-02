@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ManageEmployeeSystem
 {
@@ -49,8 +50,9 @@ namespace ManageEmployeeSystem
                 }
             }
             LoadDataJobStatus();
-            LoadEmployee();
             LoadAssignBy();
+            LoadEmployee();
+            
         }
 
         private void LoadEmployee()
@@ -81,18 +83,14 @@ namespace ManageEmployeeSystem
 
         private void LoadAssignBy()
         {
-            if (em.RoleId == 2 || em.RoleId == 3)
+            var employeedata = database.Employees.Where(e => e.Id == em.Id && e.DepartmentId == em.DepartmentId).Select(e => new
             {
-                var employeedata = database.Employees.Where(e => e.Id == em.Id && e.DepartmentId == em.DepartmentId).Select(e => new
-                {
-                    ID = e.Id,
-                    FullName = $"{e.FirstName} {e.LastName}"
-                }).ToList();
-                cbbSelectAssign.ItemsSource = employeedata;
-                cbbSelectAssign.DisplayMemberPath = "FullName";
-                cbbSelectAssign.SelectedValuePath = "ID";
-            }
-
+                ID = e.Id,
+                FullName = $"{e.FirstName} {e.LastName}"
+            }).ToList();
+            cbbSelectAssign.ItemsSource = employeedata;
+            cbbSelectAssign.DisplayMemberPath = "FullName";
+            cbbSelectAssign.SelectedValuePath = "ID";
         }
 
         private void LoadDataJobs()
@@ -143,27 +141,32 @@ namespace ManageEmployeeSystem
 
         private void dgEmployeeJobs_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (dgEmployeeJobs.SelectedItem == null)
+            //if (dgEmployeeJobs.SelectedItem == null)
+            //{
+            //    return;
+            //}
+            //var employeJob = dgEmployeeJobs.SelectedItem as dynamic;
+            //if (employeJob != null)
+            //{
+            //    //var employeeDetail = database.EmployeeJobs.FirstOrDefault(x => x.EmployeeJobId);
+            //    //txtJobID.Text = employeJob.JobId.ToString();
+            //    //txtJobName.Text = employeJob.Job.Title.ToString();
+            //    //txtDesription.Text = employeJob.Job.Description.ToString();
+            //    //txtStatus.Text = employeJob.Job.JobStatus.Name.ToString();
+            //    //txtEmployee.Text = employeJob.Employee.LastName + " " + employeJob.Employee.FirstName;
+            //    //txtAssignBy.Text = employeJob.Job.AssignedByNavigation.LastName + " " + employeJob.Job.AssignedByNavigation.FirstName;
+            //    DateOnly startDate = DateTime.Parse(employeJob.Job.StartDate.ToString());
+            //    txtStartDate.Text = startDate.ToString();
+            //    DateOnly endDate = DateTime.Parse(employeJob.Job.EndDate.ToString());
+            //    txtEndDate.Text = endDate.ToString();
+            //    txtAssignDate.Text = employeJob.AssignmentDate.ToString();
+            //}
+            var selectedJob = dgEmployeeJobs.SelectedItem as dynamic;
+            if (selectedJob != null)
             {
-                return;
+                //cbbSelectAssign.Text= selectedJob.AssignBy.ToString();
+                MessageBox.Show(selectedJob.AssignBy.ToString());
             }
-            var employeJob = dgEmployeeJobs.SelectedItem as dynamic;
-            if (employeJob != null)
-            {
-                //var employeeDetail = database.EmployeeJobs.FirstOrDefault(x => x.EmployeeJobId);
-                //txtJobID.Text = employeJob.JobId.ToString();
-                //txtJobName.Text = employeJob.Job.Title.ToString();
-                //txtDesription.Text = employeJob.Job.Description.ToString();
-                //txtStatus.Text = employeJob.Job.JobStatus.Name.ToString();
-                //txtEmployee.Text = employeJob.Employee.LastName + " " + employeJob.Employee.FirstName;
-                //txtAssignBy.Text = employeJob.Job.AssignedByNavigation.LastName + " " + employeJob.Job.AssignedByNavigation.FirstName;
-                DateOnly startDate = DateTime.Parse(employeJob.Job.StartDate.ToString());
-                txtStartDate.Text = startDate.ToString();
-                DateOnly endDate = DateTime.Parse(employeJob.Job.EndDate.ToString());
-                txtEndDate.Text = endDate.ToString();
-                txtAssignDate.Text = employeJob.AssignmentDate.ToString();
-            }
-
         }
 
         private void GoHome_Click(object sender, RoutedEventArgs e)
@@ -313,15 +316,15 @@ namespace ManageEmployeeSystem
 
         private void Clear_Click(object sender, RoutedEventArgs e)
         {
-            txtJobID.Text = string.Empty;
-            txtJobName.Text = string.Empty;
-            txtDesription.Text = string.Empty;
-            txtEndDate.Text = string.Empty;
-            txtStartDate.Text = string.Empty;
-            cbbStatus.Text = string.Empty;
-            cbbSelectAssign.Text = string.Empty;
-            txtAssignDate.Text = string.Empty;
-            cbbSelectEmployee.Text = string.Empty;
+            txtJobID.Clear();
+            txtJobName.Clear();
+            txtDesription.Clear();
+            txtEndDate.SelectedDate = null;
+            txtStartDate.SelectedDate = null;
+            cbbStatus.SelectedItem = null;
+            cbbSelectAssign.SelectedItem = null;
+            txtAssignDate.SelectedDate = null;
+            cbbSelectEmployee.SelectedItem = null;
         }
     }
 }
