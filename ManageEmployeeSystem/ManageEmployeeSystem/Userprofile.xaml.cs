@@ -35,10 +35,15 @@ namespace ManageEmployeeSystem
         {
             InitializeComponent();
             em = employee;
-            this.Title = "Hello " + employee.FirstName + " " + employee.LastName;
+            this.Title = "Xin chào, " + employee.FirstName + " " + employee.LastName;
             LoadData();
             LoadDataDepartment();
             LoadDataAccount();
+            if(em.RoleId == 1)
+            {
+                lbDepartment.Visibility = Visibility.Visible;
+                dgDepartments.Visibility = Visibility.Visible;
+            }
         }
 
         public string FormatNumber(double number)

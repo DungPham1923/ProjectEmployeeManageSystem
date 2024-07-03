@@ -29,7 +29,7 @@ namespace ManageEmployeeSystem
         public Home(Employee employee)
         {
             InitializeComponent();
-            this.Title = "Hello " + employee.FirstName + " " + employee.LastName;
+            this.Title = "Xin chào, " + employee.FirstName + " " + employee.LastName;
             em = employee;
             if (em != null)
             {

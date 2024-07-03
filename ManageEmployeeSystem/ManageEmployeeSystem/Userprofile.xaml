@@ -84,23 +84,23 @@
 
         <Button Grid.Column="4" Grid.Row="9" Content="Câp nhật" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" HorizontalAlignment="Right" Margin="0,0,18,0" Click="UpdateProfile_Click" />
 
-        <Label Grid.Row="10" Grid.Column="2" Grid.ColumnSpan="2" FontSize="20" FontWeight="DemiBold">Thông tin đăng nhập:</Label>
-        <Label Grid.Row="11" Grid.Column="2" FontSize="20">Tài khoản:</Label>
-        <TextBox Grid.Row="11" Grid.Column="3" FontSize="20" IsReadOnly="True" Margin="17,5,18,5" Name="txtUsername"/>
-        <Label Grid.Row="12" Grid.Column="2" FontSize="20">Mật khẩu cũ:</Label>
-        <PasswordBox Grid.Row="12" Grid.Column="3" FontSize="20" Margin="17,5,18,5" Name="txtOldpassword"/>
-        <Label Grid.Row="13" Grid.Column="2" FontSize="20">Mật khẩu mới:</Label>
-        <PasswordBox Grid.Row="13" Grid.Column="3" FontSize="20" Margin="17,5,18,5" Name="txtNewpassword"/>
-        <Label Grid.Row="14" Grid.Column="2" FontSize="20">Xác nhận mật khẩu:</Label>
-        <PasswordBox Grid.Row="14" Grid.Column="3" FontSize="20" Margin="17,5,18,5" Name="txtRepassword"/>
-        <Button Grid.Row="15" Grid.Column="3"  Content="Đổi mật khẩu" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" HorizontalAlignment="Right" Margin="0,0,18,0" Click="Changepassword_Click" />
+        <Label Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" FontSize="20" FontWeight="DemiBold">Thông tin đăng nhập:</Label>
+        <Label Grid.Row="11" Grid.Column="0" FontSize="20">Tài khoản:</Label>
+        <TextBox Grid.Row="11" Grid.Column="1" FontSize="20" IsReadOnly="True" Margin="17,5,18,5" Name="txtUsername"/>
+        <Label Grid.Row="12" Grid.Column="0" FontSize="20">Mật khẩu cũ:</Label>
+        <PasswordBox Grid.Row="12" Grid.Column="1" FontSize="20" Margin="17,5,18,5" Name="txtOldpassword"/>
+        <Label Grid.Row="13" Grid.Column="0" FontSize="20">Mật khẩu mới:</Label>
+        <PasswordBox Grid.Row="13" Grid.Column="1" FontSize="20" Margin="17,5,18,5" Name="txtNewpassword"/>
+        <Label Grid.Row="14" Grid.Column="0" FontSize="20">Xác nhận mật khẩu:</Label>
+        <PasswordBox Grid.Row="14" Grid.Column="1" FontSize="20" Margin="17,5,18,5" Name="txtRepassword"/>
+        <Button Grid.Row="15" Grid.Column="1"  Content="Đổi mật khẩu" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" HorizontalAlignment="Right" Margin="0,0,18,0" Click="Changepassword_Click" />
 
         <StackPanel Orientation="Horizontal" Grid.Column="3" Grid.Row="0" HorizontalAlignment="Right" Margin="0,0,15,0">
             <Button Content="Trang chủ" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0" Click="GoHome_Click"/>
             <Button Content="Đăng xuất" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0" Click="Logout_Click" />
         </StackPanel>
-        <Label Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" FontSize="20" FontWeight="DemiBold">Danh sách phòng ban:</Label>
-        <DataGrid Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="4" Width="680" FontSize="15" Margin="0,0,20,0" Name="dgDepartments" SelectionChanged="dgDepartments_SelectionChanged">
+        <Label Grid.Row="10" Grid.Column="2" Grid.ColumnSpan="2" FontSize="20" FontWeight="DemiBold" Name="lbDepartment" Visibility="Collapsed">Danh sách phòng ban:</Label>
+        <DataGrid Grid.Row="11" Grid.Column="2" Grid.ColumnSpan="2" Grid.RowSpan="4" Width="680" Visibility="Collapsed" FontSize="15" Margin="0,0,20,0" Name="dgDepartments" SelectionChanged="dgDepartments_SelectionChanged">
         </DataGrid>
     </Grid>
 </Window>

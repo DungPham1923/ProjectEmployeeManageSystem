@@ -1,4 +1,5 @@
 ﻿using ManageEmployeeSystem.Models;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using static System.Net.Mime.MediaTypeNames;
+//using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace ManageEmployeeSystem
 {
@@ -33,7 +35,7 @@ namespace ManageEmployeeSystem
         {
             InitializeComponent();
             em = employee;
-            this.Title = "Hello " + employee.FirstName + " " + employee.LastName;
+            this.Title = "Xin chào, " + employee.FirstName + " " + employee.LastName;
 
             if (em != null)
             {
@@ -47,19 +49,20 @@ namespace ManageEmployeeSystem
                     LoadDataJobs();
                     cbAllJob.Visibility = Visibility.Visible;
                     cbIndiJob.Visibility = Visibility.Visible;
+                    cbbItemSearch.Visibility = Visibility.Visible;
                 }
             }
             LoadDataJobStatus();
             LoadAssignBy();
             LoadEmployee();
-            
+
         }
 
         private void LoadEmployee()
         {
             if (em.RoleId == 2)
             {
-                var employeedata = database.Employees.Where(e => e.Id == em.Id && e.DepartmentId == em.DepartmentId).Select(e => new
+                var employeedata = database.Employees.Where(e => e.Id == em.Id && e.DepartmentId == em.DepartmentId && e.IsDelete == false).Select(e => new
                 {
                     ID = e.Id,
                     FullName = $"{e.FirstName} {e.LastName}"
@@ -70,7 +73,7 @@ namespace ManageEmployeeSystem
             }
             if (em.RoleId == 3)
             {
-                var employeedata = database.Employees.Where(e => e.DepartmentId == em.DepartmentId).Select(e => new
+                var employeedata = database.Employees.Where(e => e.DepartmentId == em.DepartmentId && e.IsDelete == false).Select(e => new
                 {
                     ID = e.Id,
                     FullName = $"{e.FirstName} {e.LastName}"
@@ -83,7 +86,7 @@ namespace ManageEmployeeSystem
 
         private void LoadAssignBy()
         {
-            var employeedata = database.Employees.Where(e => e.Id == em.Id && e.DepartmentId == em.DepartmentId).Select(e => new
+            var employeedata = database.Employees.Where(e => e.Id == em.Id && e.DepartmentId == em.DepartmentId && e.IsDelete == false).Select(e => new
             {
                 ID = e.Id,
                 FullName = $"{e.FirstName} {e.LastName}"
@@ -95,7 +98,7 @@ namespace ManageEmployeeSystem
 
         private void LoadDataJobs()
         {
-            var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId).Select(j => new
+            var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && j.IsDelete == false).Select(j => new
             {
                 ID = j.EmployeeJobId,
                 JobID = j.JobId,
@@ -113,7 +116,7 @@ namespace ManageEmployeeSystem
         private void LoadIndiJobs()
         {
             dgEmployeeJobs.ItemsSource = string.Empty;
-            var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && j.EmployeeId == em.Id).Select(j => new
+            var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && j.EmployeeId == em.Id && j.IsDelete == false).Select(j => new
             {
                 ID = j.EmployeeJobId,
                 JobID = j.JobId,
@@ -325,6 +328,383 @@ namespace ManageEmployeeSystem
             cbbSelectAssign.SelectedItem = null;
             txtAssignDate.SelectedDate = null;
             cbbSelectEmployee.SelectedItem = null;
+        }
+
+        private void UpdateJob_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string jobID = txtJobID.Text;
+                if (!int.TryParse(jobID, out int jobIDInt))
+                {
+                    MessageBox.Show("Không tồn tại JobID!", "Thông báo");
+                    return;
+                }
+
+                //Data bảng employeeJobs:
+                string employeeJobId = txtEmployeeJobID.Text;
+                if (!int.TryParse(employeeJobId, out int employeeJobIdInt))
+                {
+                    MessageBox.Show("Không tồn tại EmployeeJobID!", "Thông báo");
+                    return;
+                }
+
+                DateOnly assignmentDate = DateOnly.FromDateTime(txtAssignDate.SelectedDate.Value);
+                int idEmployee = (int)cbbSelectEmployee.SelectedValue;
+
+                //Data bảng jobs:
+                string jobName = txtJobName.Text;
+                string jobDescription = txtDesription.Text;
+                //(int)cbbStatus.SelectedValue;
+                JobStatus selectedJobStatus = cbbStatus.SelectedItem as JobStatus;
+                int idStatus = 0;
+                if (selectedJobStatus != null)
+                {
+                    idStatus = selectedJobStatus.Id;
+                }
+
+                int idAssignBy = em.Id;
+
+                DateOnly startDate = DateOnly.FromDateTime(txtStartDate.SelectedDate.Value);
+                DateOnly endDate = DateOnly.FromDateTime(txtEndDate.SelectedDate.Value);
+
+
+                if (string.IsNullOrWhiteSpace(jobName))
+                {
+                    MessageBox.Show("Vui lòng nhập tên công việc!", "Thông báo");
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(jobDescription))
+                {
+                    MessageBox.Show("Vui lòng nhập mô tả công việc!", "Thông báo");
+                    return;
+                }
+
+                if (idStatus == 0)
+                {
+                    MessageBox.Show("Vui lòng lựa chọn trạng thái công việc!", "Thông báo");
+                    return;
+                }
+
+                if (idEmployee == 0)
+                {
+                    MessageBox.Show("Vui lòng lựa chọn nhân viên đảm nhận công việc!", "Thông báo");
+                    return;
+                }
+
+                if (startDate == null)
+                {
+                    MessageBox.Show("Vui lòng lựa chọn ngày bắt đầu công việc!", "Thông báo");
+                    return;
+                }
+
+                if (endDate == null)
+                {
+                    MessageBox.Show("Vui lòng lựa chọn ngày kết thúc công việc!", "Thông báo");
+                    return;
+                }
+
+                if (assignmentDate == null)
+                {
+                    MessageBox.Show("Vui lòng lựa chọn ngày giao việc!", "Thông báo");
+                    return;
+                }
+
+                //update bảng job;
+                Job job = database.Jobs.SingleOrDefault(j => j.Id == jobIDInt);
+                if (job != null)
+                {
+                    job.Title = jobName;
+                    job.Description = jobDescription;
+                    job.StartDate = startDate;
+                    job.EndDate = endDate;
+                    job.AssignedBy = idAssignBy;
+                    job.JobStatusId = idStatus;
+                    job.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
+                }
+
+
+
+                //update bảng employeeJob
+                EmployeeJob employeeJob = database.EmployeeJobs.SingleOrDefault(j => j.EmployeeJobId == employeeJobIdInt);
+                if (employeeJob != null)
+                {
+                    employeeJob.EmployeeId = idEmployee;
+                    employeeJob.AssignmentDate = assignmentDate;
+                    employeeJob.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
+                }
+
+                if (database.SaveChanges() > 0)
+                {
+                    MessageBox.Show("Cập nhật dữ liệu công việc thành công!", "Thông báo");
+                    LoadDataJobs();
+                }
+                else
+                {
+                    MessageBox.Show("Cập nhật dữ liệu thất bại!", "Thông báo");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Cập nhật dữ liệu thất bại!" + ex.Message, "Thông báo");
+            }
+        }
+
+        private void DeleteJob_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string jobID = txtJobID.Text;
+                if (!int.TryParse(jobID, out int jobIDInt))
+                {
+                    MessageBox.Show("Không tồn tại JobID!", "Thông báo");
+                    return;
+                }
+                string employeeJobId = txtEmployeeJobID.Text;
+                if (!int.TryParse(employeeJobId, out int employeeJobIdInt))
+                {
+                    MessageBox.Show("Không tồn tại EmployeeJobID!", "Thông báo");
+                    return;
+                }
+
+                //tìm data job
+                Job job = database.Jobs.SingleOrDefault(j => j.Id == jobIDInt);
+                //tìm data employeeJob
+                EmployeeJob employeeJob = database.EmployeeJobs.SingleOrDefault(j => j.EmployeeJobId == employeeJobIdInt);
+
+                //check xem có quyền xóa công việc này hay không
+                if (job.AssignedBy == em.ManagerId && job.AssignedBy != em.Id) //công việc này do trường phòng giao và trưởng phòng không phải là mình
+                {
+                    MessageBox.Show("Bạn không thể xóa công việc do quản lý của bạn giao!", "Thông báo");
+                }
+                else
+                {
+                    if (employeeJob != null && job != null)
+                    {
+                        if (MessageBox.Show("Bạn có chắc chắn muốn xóa dữ liệu công việc này!", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        {
+                            //database.EmployeeJobs.Remove(employeeJob);
+                            //database.Jobs.Remove(job);
+                            job.IsDelete = true;
+                            employeeJob.IsDelete = true;
+                        }
+                        if (database.SaveChanges() > 0)
+                        {
+                            MessageBox.Show("Xóa dữ liệu công việc thành công!", "Thông báo");
+                            LoadDataJobs();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Xóa dữ liệu công việc thất bại!" + ex.Message, "Thông báo");
+            }
+        }
+
+        private void AddNewJob_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                //Data bảng employeeJobs:
+                DateOnly assignmentDate = DateOnly.FromDateTime(txtAssignDate.SelectedDate.Value);
+                int idEmployee = (int)cbbSelectEmployee.SelectedValue;
+
+                //Data bảng jobs:
+                string jobName = txtJobName.Text;
+                string jobDescription = txtDesription.Text;
+                //(int)cbbStatus.SelectedValue;
+                JobStatus selectedJobStatus = cbbStatus.SelectedItem as JobStatus;
+                int idStatus = 0;
+                if (selectedJobStatus != null)
+                {
+                    idStatus = selectedJobStatus.Id;
+                }
+
+                int idAssignBy = em.Id;
+
+                DateOnly startDate = DateOnly.FromDateTime(txtStartDate.SelectedDate.Value);
+                DateOnly endDate = DateOnly.FromDateTime(txtEndDate.SelectedDate.Value);
+
+
+                if (string.IsNullOrWhiteSpace(jobName))
+                {
+                    MessageBox.Show("Vui lòng nhập tên công việc!", "Thông báo");
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(jobDescription))
+                {
+                    MessageBox.Show("Vui lòng nhập mô tả công việc!", "Thông báo");
+                    return;
+                }
+
+                if (idStatus == 0)
+                {
+                    MessageBox.Show("Vui lòng lựa chọn trạng thái công việc!", "Thông báo");
+                    return;
+                }
+
+                if (idEmployee == 0)
+                {
+                    MessageBox.Show("Vui lòng lựa chọn nhân viên đảm nhận công việc!", "Thông báo");
+                    return;
+                }
+
+                if (startDate == null)
+                {
+                    MessageBox.Show("Vui lòng lựa chọn ngày bắt đầu công việc!", "Thông báo");
+                    return;
+                }
+
+                if (endDate == null)
+                {
+                    MessageBox.Show("Vui lòng lựa chọn ngày kết thúc công việc!", "Thông báo");
+                    return;
+                }
+
+                if (assignmentDate == null)
+                {
+                    MessageBox.Show("Vui lòng lựa chọn ngày giao việc!", "Thông báo");
+                    return;
+                }
+
+                Job newJob = new Job();
+                newJob.Title = jobName;
+                newJob.Description = jobDescription;
+                newJob.AssignedBy = idAssignBy;
+                newJob.DepartmentId = em.DepartmentId;
+                newJob.StartDate = startDate;
+                newJob.EndDate = endDate;
+                newJob.JobStatusId = idStatus;
+                newJob.CreatedAt = DateOnly.FromDateTime(DateTime.Now);
+                newJob.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
+                database.Jobs.Add(newJob);
+                database.SaveChanges();
+
+                Job newJobInDatabase = database.Jobs.OrderByDescending(j => j.Id).FirstOrDefault();
+
+
+                EmployeeJob newEmployeejob = new EmployeeJob();
+
+                newEmployeejob.EmployeeId = idEmployee;
+                newEmployeejob.JobId = newJobInDatabase.Id;
+                newEmployeejob.AssignmentDate = assignmentDate;
+                newEmployeejob.CreatedAt = DateOnly.FromDateTime(DateTime.Now);
+                newEmployeejob.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
+                database.EmployeeJobs.Add(newEmployeejob);
+
+                if (database.SaveChanges() > 0)
+                {
+                    MessageBox.Show("Thêm mới công việc thành công!", "Thông báo");
+                    LoadDataJobs();
+                }
+                else
+                {
+                    MessageBox.Show("Thêm mới công việc thất bại!", "Thông báo");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Thêm mới công việc thất bại!" + ex.Message, "Thông báo");
+            }
+        }
+
+        private void Search_Click(object sender, RoutedEventArgs e)
+        {
+            if(cbbFilter.SelectedIndex == -1)
+            {
+                MessageBox.Show("Vui lòng lựa chọn loại tìm kiếm!", "Thông báo");
+                return;
+            }
+            if (txtDatasearch.Text.IsNullOrEmpty())
+            {
+                MessageBox.Show("Vui lòng nhập từ khóa tìm kiếm!", "Thông báo");
+                return;
+            }
+            if(cbbFilter.SelectedIndex == 0)
+            {
+                var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && (j.Employee.FirstName + " " + j.Employee.LastName).ToLower().Contains(txtDatasearch.Text.ToLower())).Select(j => new
+                {
+                    ID = j.EmployeeJobId,
+                    JobID = j.JobId,
+                    JobName = j.Job.Title,
+                    Description = j.Job.Description,
+                    EmployeeName = j.Employee.FirstName + " " + j.Employee.LastName,
+                    AssignBy = j.Job.AssignedByNavigation.FirstName + " " + j.Job.AssignedByNavigation.LastName,
+                    StartDate = j.Job.StartDate,
+                    EndDate = j.Job.EndDate,
+                    AssigmentDate = j.AssignmentDate,
+                    Status = j.Job.JobStatus.Name,
+                }).ToList();
+                if (job.Any())
+                {
+                    dgEmployeeJobs.ItemsSource = job.ToList();
+                    cbAllJob.IsChecked = false;
+                }
+                else
+                {
+                    MessageBox.Show("Không tìm thấy nhân viên có tên : " + txtDatasearch.Text, "Thông báo");
+                    return;
+                }
+            }
+            else if(cbbFilter.SelectedIndex == 1)
+            {
+                var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && j.Job.Title.ToLower().Contains(txtDatasearch.Text)).Select(j => new
+                {
+                    ID = j.EmployeeJobId,
+                    JobID = j.JobId,
+                    JobName = j.Job.Title,
+                    Description = j.Job.Description,
+                    EmployeeName = j.Employee.FirstName + " " + j.Employee.LastName,
+                    AssignBy = j.Job.AssignedByNavigation.FirstName + " " + j.Job.AssignedByNavigation.LastName,
+                    StartDate = j.Job.StartDate,
+                    EndDate = j.Job.EndDate,
+                    AssigmentDate = j.AssignmentDate,
+                    Status = j.Job.JobStatus.Name,
+                }).ToList();
+                dgEmployeeJobs.ItemsSource = job.ToList();
+                cbAllJob.IsChecked = false;
+                if (job.Any())
+                {
+                    dgEmployeeJobs.ItemsSource = job.ToList();
+                    cbAllJob.IsChecked = false;
+                }
+                else
+                {
+                    MessageBox.Show("Không tìm thấy công việc có tên: " + txtDatasearch.Text, "Thông báo");
+                    return;
+                }
+            }
+            else if(cbbFilter.SelectedIndex == 2)
+            {
+                var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && (j.Job.AssignedByNavigation.FirstName + " " + j.Job.AssignedByNavigation.LastName).ToLower().Contains(txtDatasearch.Text.ToLower()) ).Select(j => new
+                {
+                    ID = j.EmployeeJobId,
+                    JobID = j.JobId,
+                    JobName = j.Job.Title,
+                    Description = j.Job.Description,
+                    EmployeeName = j.Employee.FirstName + " " + j.Employee.LastName,
+                    AssignBy = j.Job.AssignedByNavigation.FirstName + " " + j.Job.AssignedByNavigation.LastName,
+                    StartDate = j.Job.StartDate,
+                    EndDate = j.Job.EndDate,
+                    AssigmentDate = j.AssignmentDate,
+                    Status = j.Job.JobStatus.Name,
+                }).ToList();
+                dgEmployeeJobs.ItemsSource = job.ToList();
+                cbAllJob.IsChecked = false;
+                if (job.Any())
+                {
+                    dgEmployeeJobs.ItemsSource = job.ToList();
+                    cbAllJob.IsChecked = false;
+                }
+                else
+                {
+                    MessageBox.Show("Không tìm thấy người giao việc tên: " + txtDatasearch.Text, "Thông báo");
+                    return;
+                }
+            }
         }
     }
 }
