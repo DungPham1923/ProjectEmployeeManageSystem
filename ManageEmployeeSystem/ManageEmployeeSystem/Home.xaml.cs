@@ -91,5 +91,13 @@ namespace ManageEmployeeSystem
             this.Close();
 
         }
+
+        private void EmployeeList_Click(object sender, RoutedEventArgs e)
+        {
+            ManageEmployee manageEmployee = new ManageEmployee(em);
+            this.Hide();
+            manageEmployee.ShowDialog();
+            this.Close();
+        }
     }
 }

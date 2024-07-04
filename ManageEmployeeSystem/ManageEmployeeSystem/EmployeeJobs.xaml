@@ -63,10 +63,10 @@
         </StackPanel>
 
         <Label Grid.Row="9" Grid.Column="0" FontSize="20" FontWeight="DemiBold">Chi tiết công việc:</Label>
-        <Label Grid.Row="11" Grid.Column="0" FontSize="20">EmployeeJobID:</Label>
+        <Label Grid.Row="11" Grid.Column="0" FontSize="20">Mã công việc | nhân viên:</Label>
         <TextBox Name="txtEmployeeJobID" IsReadOnly="True" Grid.Row="11" Grid.Column="1" Height="30" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.ID, Mode=OneWay}"/>
-        
-        <Label Grid.Row="10" Grid.Column="0" FontSize="20">JobID:</Label>
+
+        <Label Grid.Row="10" Grid.Column="0" FontSize="20">Mã công việc:</Label>
         <TextBox Name="txtJobID" IsReadOnly="True" Grid.Row="10" Grid.Column="1" Height="30" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgEmployeeJobs,Path=SelectedItem.JobID, Mode=OneWay}"/>
 
         <Label Grid.Row="12" Grid.Column="0" FontSize="20">Tên công việc:</Label>

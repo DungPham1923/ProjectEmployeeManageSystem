@@ -24,8 +24,7 @@
                 <StackPanel Name="adminFunc" Visibility="Collapsed">
                     <Button Width="400" Height="50" Margin="20" FontSize="25" Content="Thông tin cá nhân" Click="ProfileDetail_Click" />
                     <Button Width="400" Height="50" Margin="20" FontSize="25" Content="Danh sách phòng ban"/>
-                    <Button Width="400" Height="50" Margin="20" FontSize="25" Content="Dánh sách trưởng phòng"/>
-                    <Button Width="400" Height="50" Margin="20" FontSize="25" Content="Danh sách nhân viên"/>
+                    <Button Width="400" Height="50" Margin="20" FontSize="25" Content="Danh sách nhân viên" Click="EmployeeList_Click" />
                     <Button Width="400" Height="50" Margin="20" FontSize="25" Content="Danh sách công việc"/>
                 </StackPanel>
             </WrapPanel>

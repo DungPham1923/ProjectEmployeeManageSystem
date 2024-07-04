@@ -29,7 +29,8 @@ namespace ManageEmployeeSystem
         {
             InitializeComponent();
         }
-        Employee em = new Employee();
+        Employee em;
+        Employee employeeAdmin;
         ProjectPrn212Context database = new ProjectPrn212Context();
         public Userprofile(Employee employee)
         {
@@ -37,12 +38,23 @@ namespace ManageEmployeeSystem
             em = employee;
             this.Title = "Xin chào, " + employee.FirstName + " " + employee.LastName;
             LoadData();
-            LoadDataDepartment();
             LoadDataAccount();
-            if(em.RoleId == 1)
+        }
+
+        public Userprofile(Employee employeeAdmin, Employee employee)
+        {
+            InitializeComponent();
+            this.employeeAdmin = employeeAdmin;
+            this.em = employee;
+            this.Title = "Xin chào, " + employeeAdmin.FirstName + " " + employeeAdmin.LastName;
+            LoadData();
+            //LoadDepartmentList();
+            LoadDataAccount();
+            if (employeeAdmin != null)
             {
-                lbDepartment.Visibility = Visibility.Visible;
-                dgDepartments.Visibility = Visibility.Visible;
+                btnAddEmployee.Visibility = Visibility.Visible;
+                btnDeleteEmployee.Visibility = Visibility.Visible;
+                txtSalary.IsReadOnly = false;
             }
         }
 
@@ -61,28 +73,81 @@ namespace ManageEmployeeSystem
             txtAddress.Text = em.Address.ToString();
             txtPhone.Text = em.Phone.ToString();
 
-
-            var department = database.Departments.FirstOrDefault(d => d.Id == em.DepartmentId);
-            if (department != null)
+            if (employeeAdmin != null)
             {
-                txtDepartment.Text = department.Name.ToString();
-                txtDepartmentID.Text = department.Id.ToString();
+                var departments = database.Departments.ToList();
+                cbbDepartment.ItemsSource = departments;
+                cbbDepartment.DisplayMemberPath = "Name";
+                cbbDepartment.SelectedValuePath = "ID";
+
+                var positions = database.Positions.ToList();
+                cbbPosition.ItemsSource = positions;
+                cbbPosition.DisplayMemberPath = "Name";
+                cbbPosition.SelectedValuePath = "ID";
+
+                var managers = database.Employees.Where(m => m.RoleId == 3).Select(m => new
+                {
+                    ID = m.Id,
+                    Fullname = m.FirstName + " " + m.LastName
+                }).ToList();
+                cbbManager.ItemsSource = managers.ToList();
+                cbbManager.DisplayMemberPath = "Fullname";
+                cbbManager.SelectedValuePath = "ID";
+            }
+            else
+            {
+                if (em != null)
+                {
+                    var departments = database.Departments.Where(d => d.Id == em.DepartmentId).ToList();
+                    cbbDepartment.ItemsSource = departments;
+                    cbbDepartment.DisplayMemberPath = "Name";
+                    cbbDepartment.SelectedValuePath = "ID";
+
+                    var positions = database.Positions.Where(p => p.Id == em.PositionId).ToList();
+                    cbbPosition.ItemsSource = positions;
+                    cbbPosition.DisplayMemberPath = "Name";
+                    cbbPosition.SelectedValuePath = "ID";
+
+                    var managers = database.Employees.Where(m => m.Id == em.ManagerId).Select(m => new
+                    {
+                        ID = m.Id,
+                        Fullname = m.FirstName + " " + m.LastName
+                    }).ToList();
+                    cbbManager.ItemsSource = managers.ToList();
+                    cbbManager.DisplayMemberPath = "Fullname";
+                    cbbManager.SelectedValuePath = "ID";
+                }
+
+            }
+
+            var selectedDepartment = database.Departments.FirstOrDefault(d => d.Id == em.DepartmentId);
+            if (selectedDepartment != null)
+            {
+                cbbDepartment.SelectedItem = selectedDepartment;
+            }
+            var selectedPosition = database.Positions.FirstOrDefault(p => p.Id == em.PositionId);
+            if (selectedPosition != null)
+            {
+                cbbPosition.SelectedItem = selectedPosition;
+            }
+            var selectedManager = database.Employees.Select(m => new
+            {
+                ID = m.Id,
+                Fullname = m.FirstName + " " + m.LastName,
+            }).FirstOrDefault(m => m.ID == em.ManagerId);
+            if (selectedManager != null)
+            {
+                cbbManager.SelectedItem = selectedManager;
             }
 
             txtCreatedAt.Text = em.CreatedAt.ToString();
             string salary = FormatNumber((double)em.Salary);
-            txtSalary.Text = salary + " VNĐ";//em.Salary.ToString();
+            txtSalary.Text = salary;//em.Salary.ToString();
             var position = database.Positions.FirstOrDefault(p => p.Id == em.PositionId);
-            if (position != null)
-            {
-                txtPosition.Text = position.Name.ToString();
-            }
+
 
             var manager = database.Employees.FirstOrDefault(m => m.Id == em.Id);
-            if (manager != null)
-            {
-                txtManager.Text = manager.FirstName.ToString() + " " + manager.LastName.ToString();
-            }
+
 
             bool gender = em.Gender.HasValue;
             if (gender)
@@ -105,16 +170,16 @@ namespace ManageEmployeeSystem
             }
         }
 
-        private void LoadDataDepartment()
+        private void LoadDepartmentList()
         {
             var department = database.Departments.Select(d => new
             {
-                Id = d.Id,
+                ID = d.Id,
                 Name = d.Name,
-                Description = d.Description,
             }).ToList();
-            //var department = database.Departments.ToList();
-            dgDepartments.ItemsSource = department.ToList();
+            cbbDepartment.ItemsSource = department;
+            cbbDepartment.DisplayMemberPath = "Name";
+            cbbDepartment.SelectedValuePath = "ID";
         }
 
         private void LoadDataAccount()
@@ -128,11 +193,26 @@ namespace ManageEmployeeSystem
 
         private void GoHome_Click(object sender, RoutedEventArgs e)
         {
-            Home home = new Home(em);
-            this.Hide();
-            home.ShowDialog();
-            this.Close();
+            if (employeeAdmin != null)
+            {
+                Home home = new Home(employeeAdmin);
+                this.Hide();
+                home.ShowDialog();
+                this.Close();
+            }
+            else
+            {
+                if (em != null)
+                {
+                    Home home = new Home(em);
+                    this.Hide();
+                    home.ShowDialog();
+                    this.Close();
+                }
+            }
+
         }
+
 
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
@@ -143,22 +223,6 @@ namespace ManageEmployeeSystem
                 login.ShowDialog();
                 this.Close();
             }
-        }
-
-        private void dgDepartments_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (dgDepartments == null)
-            {
-                return;
-            }
-            var selectedItem = dgDepartments.SelectedItem as dynamic;
-            if (selectedItem != null)
-            {
-                txtDepartment.Text = selectedItem.Name.ToString();
-                txtDepartmentID.Text = selectedItem.Id.ToString();
-            }
-
-
         }
 
         private void UpdateProfile_Click(object sender, RoutedEventArgs e)
@@ -181,54 +245,134 @@ namespace ManageEmployeeSystem
                 {
                     gender = false;
                 }
-                //Employee employee = new Employee()
-                //{
-                //    FirstName = firstName,
-                //    LastName = lastName,
-                //    Email = email,
-                //    Phone = phone,
-                //    Address = address,
-                //    DateOfBirth = dateofbirth,
-                //    Gender = gender,
-                //};
-                var employeeUpdate = database.Employees.FirstOrDefault(e => e.Id == em.Id);
-                if (employeeUpdate != null)
+
+                //double salary = 0;
+                if (employeeAdmin != null)
                 {
-                    employeeUpdate.FirstName = firstName;
-                    employeeUpdate.LastName = lastName;
-                    employeeUpdate.Email = email;
-                    employeeUpdate.Phone = phone;
-                    employeeUpdate.Address = address;
-                    employeeUpdate.DateOfBirth = dateofbirth;
-                    employeeUpdate.Gender = gender;
-                    database.Employees.Update(employeeUpdate);
-                    if (database.SaveChanges() > 0)
+                    if (!double.TryParse(txtSalary.Text, out double salary))
                     {
-                        MessageBox.Show("Thông tin cá nhân đã được cập nhật!", "Thông báo");
-                        LoadData();
+                        MessageBox.Show("Vui lòng nhập lương của nhân viên!", "Thông báo");
+                        return;
+                    }
+                    var selectedDepartment = cbbDepartment.SelectedItem as Department;
+                    int idDepartment = selectedDepartment.Id;
+
+                    var selectedPosition = cbbPosition.SelectedItem as Position;
+                    int idPosition = selectedPosition.Id;
+
+                    if (idPosition == 1 && em.PositionId != 1 && em.ManagerId != em.Id) //nếu nó không phải là trưởng phòng và quản lí cũng khác nó
+                    {
+                        if (MessageBox.Show("Giao cho nhân viên " + em.FirstName + " " + em.LastName + " thành trưởng phòng?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        {
+                            //cho thằng trưởng phòng hiện tại thành nhân viên và chịu sự trách nhiệm quả lí của thằng được xếp làm trường phòng
+                            var changeManager = database.Employees.Where(e => e.Id == em.ManagerId).SingleOrDefault();
+                            if (changeManager != null)
+                            {
+                                changeManager.PositionId = null;
+                                changeManager.ManagerId = em.Id;
+                                changeManager.RoleId = 2;
+                                database.Employees.Update(changeManager);
+                                database.SaveChanges();
+                            }
+                        }
+                        var employeeUpdate = database.Employees.FirstOrDefault(e => e.Id == em.Id);
+                        if (employeeUpdate != null)
+                        {
+                            employeeUpdate.FirstName = firstName;
+                            employeeUpdate.LastName = lastName;
+                            employeeUpdate.Email = email;
+                            employeeUpdate.Phone = phone;
+                            employeeUpdate.Address = address;
+                            employeeUpdate.DateOfBirth = dateofbirth;
+                            employeeUpdate.Gender = gender;
+                            employeeUpdate.PositionId = idPosition;
+                            employeeUpdate.DepartmentId = idDepartment;
+                            employeeUpdate.ManagerId = em.Id;
+                            employeeUpdate.RoleId = 3;
+
+                            database.Employees.Update(employeeUpdate);
+                            if (database.SaveChanges() > 0)
+                            {
+                                MessageBox.Show("Thông tin cá nhân đã được cập nhật!", "Thông báo");
+                                LoadData();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Không có thay đổi nào được lưu!", "Thông báo");
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("Không tìm thấy nhân viên!", "Thông báo");
+                        }
                     }
                     else
                     {
-                        MessageBox.Show("Không có thay đổi nào được lưu!", "Thông báo");
+                        var selectedManager = cbbManager.SelectedItem as dynamic;
+                        int idManager = selectedManager.ID;
+
+                        var employeeUpdate = database.Employees.FirstOrDefault(e => e.Id == em.Id);
+                        if (employeeUpdate != null)
+                        {
+                            employeeUpdate.FirstName = firstName;
+                            employeeUpdate.LastName = lastName;
+                            employeeUpdate.Email = email;
+                            employeeUpdate.Phone = phone;
+                            employeeUpdate.Address = address;
+                            employeeUpdate.DateOfBirth = dateofbirth;
+                            employeeUpdate.Gender = gender;
+                            employeeUpdate.PositionId = idPosition;
+                            employeeUpdate.DepartmentId = idDepartment;
+                            employeeUpdate.ManagerId = idManager;
+
+                            database.Employees.Update(employeeUpdate);
+                            if (database.SaveChanges() > 0)
+                            {
+                                MessageBox.Show("Thông tin cá nhân đã được cập nhật!", "Thông báo");
+                                LoadData();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Không có thay đổi nào được lưu!", "Thông báo");
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("Không tìm thấy nhân viên!", "Thông báo");
+                        }
                     }
+
+
                 }
                 else
                 {
-                    MessageBox.Show("Không tìm thấy nhân viên!", "Thông báo");
+                    var employeeUpdate = database.Employees.FirstOrDefault(e => e.Id == em.Id);
+                    if (employeeUpdate != null)
+                    {
+                        employeeUpdate.FirstName = firstName;
+                        employeeUpdate.LastName = lastName;
+                        employeeUpdate.Email = email;
+                        employeeUpdate.Phone = phone;
+                        employeeUpdate.Address = address;
+                        employeeUpdate.DateOfBirth = dateofbirth;
+                        employeeUpdate.Gender = gender;
+
+                        database.Employees.Update(employeeUpdate);
+                        if (database.SaveChanges() > 0)
+                        {
+                            MessageBox.Show("Thông tin cá nhân đã được cập nhật!", "Thông báo");
+                            LoadData();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Không có thay đổi nào được lưu!", "Thông báo");
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Không tìm thấy nhân viên!", "Thông báo");
+                    }
                 }
-
-
-
-                //if(txtFirstname.Text == null) { MessageBox.Show("Tên không được để trống!", "Thông báo");  return; }
-                //else { firstName = txtFirstname.Text; }
-
-                //if(txtLastname.Text == null) { MessageBox.Show("Họ không được để trống!", "Thông báo"); return; } 
-                //else{ lastName = txtLastname.Text; }
-
-                //if(txtEmail.Text == null) { MessageBox.Show("Email không được để trống!", "Thông báo"); return; }
-                //else { email = txtEmail.Text; }
-
-                //if (txtPhone.Text == null) { MessageBox.Show("Số điện thoại không được để trống!", "Thông báo"); return; }
 
 
             }
@@ -305,5 +449,52 @@ namespace ManageEmployeeSystem
             txtNewpassword.Clear();
             txtRepassword.Clear();
         }
+
+        private void cbbDepartment_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int departmentId = 0;
+            var department = cbbDepartment.SelectedItem as Department;
+            if (department != null)
+            {
+                departmentId = department.Id;
+                var employeee = database.Employees.Where(e => e.DepartmentId == departmentId && e.RoleId == 3).Select(e => new
+                {
+                    ID = e.Id,
+                    Fullname = e.FirstName + " " + e.LastName,
+                }).FirstOrDefault();
+                if (employeee != null)
+                {
+                    cbbManager.SelectedItem = employeee;
+                }
+            }
+        }
+
+        private void cbbManager_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int managerId = 0;
+            var manager = cbbManager.SelectedItem as dynamic;
+            if (manager != null)
+            {
+                managerId = manager.ID;
+                var employee = database.Employees.FirstOrDefault(emp => emp.Id == managerId);
+                if (employee != null)
+                {
+                    var department = database.Departments.FirstOrDefault(d => d.Id == employee.DepartmentId);
+                    if (department != null)
+                    {
+                        cbbDepartment.SelectedItem = department;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Không tìm thấy phòng ban!", "Thông báo");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Lỗi tìm quản lý!", "Thông báo");
+                }
+            }
+        }
+
     }
 }
