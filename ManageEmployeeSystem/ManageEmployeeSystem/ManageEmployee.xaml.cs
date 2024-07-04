@@ -158,5 +158,14 @@ namespace ManageEmployeeSystem
                 this.Close();
             }
         }
+
+        private void AddNewEmployee_Click(object sender, RoutedEventArgs e)
+        {
+            Employee emNull = new Employee();
+            Userprofile userprofile = new Userprofile(em);
+            this.Hide();
+            userprofile.ShowDialog();
+            this.Close();
+        }
     }
 }

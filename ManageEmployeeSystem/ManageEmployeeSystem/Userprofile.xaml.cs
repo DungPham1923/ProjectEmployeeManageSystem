@@ -36,9 +36,20 @@ namespace ManageEmployeeSystem
         {
             InitializeComponent();
             em = employee;
-            this.Title = "Xin chào, " + employee.FirstName + " " + employee.LastName;
-            LoadData();
-            LoadDataAccount();
+            if (em.RoleId == 1)
+            {
+                this.Title = "Xin chào admin, " + employee.FirstName + " " + employee.LastName;
+                btnAddEmployee.Visibility = Visibility.Visible;
+                btnUpdateEmployee.Visibility = Visibility.Collapsed;
+                txtSalary.IsReadOnly = false;
+                LoadDataSub();
+            }
+            else
+            {
+                LoadData();
+                LoadDataAccount();
+                this.Title = "Xin chào, " + employee.FirstName + " " + employee.LastName;
+            }
         }
 
         public Userprofile(Employee employeeAdmin, Employee employee)
@@ -46,15 +57,19 @@ namespace ManageEmployeeSystem
             InitializeComponent();
             this.employeeAdmin = employeeAdmin;
             this.em = employee;
-            this.Title = "Xin chào, " + employeeAdmin.FirstName + " " + employeeAdmin.LastName;
             LoadData();
             //LoadDepartmentList();
             LoadDataAccount();
             if (employeeAdmin != null)
             {
+                this.Title = "Xin chào admin, " + employeeAdmin.FirstName + " " + employeeAdmin.LastName;
                 btnAddEmployee.Visibility = Visibility.Visible;
                 btnDeleteEmployee.Visibility = Visibility.Visible;
                 txtSalary.IsReadOnly = false;
+            }
+            else
+            {
+                this.Title = "Xin chào, " + employee.FirstName + " " + employee.LastName;
             }
         }
 
@@ -63,16 +78,9 @@ namespace ManageEmployeeSystem
             return number.ToString("#,###,###");
         }
 
-        private void LoadData()
+        private void LoadDataSub()
         {
-            txtID.Text = em.Id.ToString();
-            txtFirstname.Text = em.FirstName.ToString();
-            txtLastname.Text = em.LastName.ToString();
-            txtEmail.Text = em.Email.ToString();
-            txtBirthdate.Text = em.DateOfBirth.ToString();
-            txtAddress.Text = em.Address.ToString();
-            txtPhone.Text = em.Phone.ToString();
-
+            var employee = database.Employees.Where(e => e.Id == em.Id).SingleOrDefault();
             if (employeeAdmin != null)
             {
                 var departments = database.Departments.ToList();
@@ -98,17 +106,38 @@ namespace ManageEmployeeSystem
             {
                 if (em != null)
                 {
-                    var departments = database.Departments.Where(d => d.Id == em.DepartmentId).ToList();
+                    var departments = database.Departments.Where(d => d.Id == employee.DepartmentId).ToList();
                     cbbDepartment.ItemsSource = departments;
                     cbbDepartment.DisplayMemberPath = "Name";
                     cbbDepartment.SelectedValuePath = "ID";
 
-                    var positions = database.Positions.Where(p => p.Id == em.PositionId).ToList();
+                    var positions = database.Positions.Where(p => p.Id == employee.PositionId).ToList();
                     cbbPosition.ItemsSource = positions;
                     cbbPosition.DisplayMemberPath = "Name";
                     cbbPosition.SelectedValuePath = "ID";
 
-                    var managers = database.Employees.Where(m => m.Id == em.ManagerId).Select(m => new
+                    var managers = database.Employees.Where(m => m.Id == employee.ManagerId).Select(m => new
+                    {
+                        ID = m.Id,
+                        Fullname = m.FirstName + " " + m.LastName
+                    }).ToList();
+                    cbbManager.ItemsSource = managers.ToList();
+                    cbbManager.DisplayMemberPath = "Fullname";
+                    cbbManager.SelectedValuePath = "ID";
+                }
+                if (em != null && em.RoleId == 1)
+                {
+                    var departments = database.Departments.ToList();
+                    cbbDepartment.ItemsSource = departments;
+                    cbbDepartment.DisplayMemberPath = "Name";
+                    cbbDepartment.SelectedValuePath = "ID";
+
+                    var positions = database.Positions.ToList();
+                    cbbPosition.ItemsSource = positions;
+                    cbbPosition.DisplayMemberPath = "Name";
+                    cbbPosition.SelectedValuePath = "ID";
+
+                    var managers = database.Employees.Where(m => m.RoleId == 3).Select(m => new
                     {
                         ID = m.Id,
                         Fullname = m.FirstName + " " + m.LastName
@@ -119,13 +148,26 @@ namespace ManageEmployeeSystem
                 }
 
             }
+        }
+        private void LoadData()
+        {
+            var employee = database.Employees.Where(e => e.Id == em.Id).SingleOrDefault();
+            txtID.Text = employee.Id.ToString();
+            txtFirstname.Text = employee.FirstName.ToString();
+            txtLastname.Text = employee.LastName.ToString();
+            txtEmail.Text = employee.Email.ToString();
+            txtBirthdate.Text = employee.DateOfBirth.ToString();
+            txtAddress.Text = employee.Address.ToString();
+            txtPhone.Text = employee.Phone.ToString();
 
-            var selectedDepartment = database.Departments.FirstOrDefault(d => d.Id == em.DepartmentId);
+            LoadDataSub();
+
+            var selectedDepartment = database.Departments.FirstOrDefault(d => d.Id == employee.DepartmentId);
             if (selectedDepartment != null)
             {
                 cbbDepartment.SelectedItem = selectedDepartment;
             }
-            var selectedPosition = database.Positions.FirstOrDefault(p => p.Id == em.PositionId);
+            var selectedPosition = database.Positions.FirstOrDefault(p => p.Id == employee.PositionId);
             if (selectedPosition != null)
             {
                 cbbPosition.SelectedItem = selectedPosition;
@@ -134,22 +176,22 @@ namespace ManageEmployeeSystem
             {
                 ID = m.Id,
                 Fullname = m.FirstName + " " + m.LastName,
-            }).FirstOrDefault(m => m.ID == em.ManagerId);
+            }).FirstOrDefault(m => m.ID == employee.ManagerId);
             if (selectedManager != null)
             {
                 cbbManager.SelectedItem = selectedManager;
             }
 
-            txtCreatedAt.Text = em.CreatedAt.ToString();
-            string salary = FormatNumber((double)em.Salary);
+            txtCreatedAt.Text = employee.CreatedAt.ToString();
+            string salary = FormatNumber((double)employee.Salary);
             txtSalary.Text = salary;//em.Salary.ToString();
-            var position = database.Positions.FirstOrDefault(p => p.Id == em.PositionId);
+            var position = database.Positions.FirstOrDefault(p => p.Id == employee.PositionId);
 
 
-            var manager = database.Employees.FirstOrDefault(m => m.Id == em.Id);
+            var manager = database.Employees.FirstOrDefault(m => m.Id == employee.Id);
 
 
-            bool gender = em.Gender.HasValue;
+            bool gender = employee.Gender.HasValue;
             if (gender)
             {
                 radioBoy.IsChecked = gender;
@@ -159,7 +201,7 @@ namespace ManageEmployeeSystem
                 radioGirl.IsChecked = !gender;
             }
 
-            bool status = em.IsDelete.Value;
+            bool status = employee.IsDelete.Value;
             if (status == false)
             {
                 txtStatus.Text = "Đang hoạt động";
@@ -266,6 +308,7 @@ namespace ManageEmployeeSystem
                         {
                             //cho thằng trưởng phòng hiện tại thành nhân viên và chịu sự trách nhiệm quả lí của thằng được xếp làm trường phòng
                             var changeManager = database.Employees.Where(e => e.Id == em.ManagerId).SingleOrDefault();
+                            var changeManagerEmployee = database.Employees.Where(e => e.ManagerId == changeManager.Id).ToList();
                             if (changeManager != null)
                             {
                                 changeManager.PositionId = null;
@@ -273,6 +316,10 @@ namespace ManageEmployeeSystem
                                 changeManager.RoleId = 2;
                                 database.Employees.Update(changeManager);
                                 database.SaveChanges();
+                            }
+                            if (changeManagerEmployee != null)
+                            {
+                                changeManagerEmployee.ForEach(e => { e.ManagerId = em.Id; });
                             }
                         }
                         var employeeUpdate = database.Employees.FirstOrDefault(e => e.Id == em.Id);
