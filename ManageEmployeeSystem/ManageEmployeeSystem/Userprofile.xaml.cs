@@ -45,11 +45,11 @@ namespace ManageEmployeeSystem
             {
                 this.Title = "Xin chào, " + employee.FirstName + " " + employee.LastName;
             }
+            radioActive.IsEnabled = false;
+            radioInactive.IsEnabled = false;
             LoadData(em.Id);
             LoadDataAccount();
         }
-
-
         public Userprofile(Employee employeeAdmin, Employee employee)
         {
             InitializeComponent();
@@ -109,7 +109,6 @@ namespace ManageEmployeeSystem
         {
             return number.ToString("#,###,###");
         }
-
         private void LoadDataSub()
         {
             var employee = database.Employees.Where(e => e.Id == em.Id).SingleOrDefault();
@@ -157,27 +156,27 @@ namespace ManageEmployeeSystem
                     cbbManager.DisplayMemberPath = "Fullname";
                     cbbManager.SelectedValuePath = "ID";
                 }
-                if (em != null && em.RoleId == 1)
-                {
-                    var departments = database.Departments.ToList();
-                    cbbDepartment.ItemsSource = departments;
-                    cbbDepartment.DisplayMemberPath = "Name";
-                    cbbDepartment.SelectedValuePath = "ID";
+                //if (em != null && em.RoleId == 1)
+                //{
+                //    var departments = database.Departments.ToList();
+                //    cbbDepartment.ItemsSource = departments;
+                //    cbbDepartment.DisplayMemberPath = "Name";
+                //    cbbDepartment.SelectedValuePath = "ID";
 
-                    var positions = database.Positions.ToList();
-                    cbbPosition.ItemsSource = positions;
-                    cbbPosition.DisplayMemberPath = "Name";
-                    cbbPosition.SelectedValuePath = "ID";
+                //    var positions = database.Positions.ToList();
+                //    cbbPosition.ItemsSource = positions;
+                //    cbbPosition.DisplayMemberPath = "Name";
+                //    cbbPosition.SelectedValuePath = "ID";
 
-                    var managers = database.Employees.Where(m => m.RoleId == 3).Select(m => new
-                    {
-                        ID = m.Id,
-                        Fullname = m.FirstName + " " + m.LastName
-                    }).ToList();
-                    cbbManager.ItemsSource = managers.ToList();
-                    cbbManager.DisplayMemberPath = "Fullname";
-                    cbbManager.SelectedValuePath = "ID";
-                }
+                //    var managers = database.Employees.Where(m => m.RoleId == 3).Select(m => new
+                //    {
+                //        ID = m.Id,
+                //        Fullname = m.FirstName + " " + m.LastName
+                //    }).ToList();
+                //    cbbManager.ItemsSource = managers.ToList();
+                //    cbbManager.DisplayMemberPath = "Fullname";
+                //    cbbManager.SelectedValuePath = "ID";
+                //}
 
             }
         }
@@ -245,7 +244,6 @@ namespace ManageEmployeeSystem
             }
 
         }
-
         private void LoadDepartmentList()
         {
             var department = database.Departments.Select(d => new
@@ -257,7 +255,6 @@ namespace ManageEmployeeSystem
             cbbDepartment.DisplayMemberPath = "Name";
             cbbDepartment.SelectedValuePath = "ID";
         }
-
         private void LoadDataAccount()
         {
             var account = database.Authentications.SingleOrDefault(a => a.EmployeeId == em.Id);
@@ -266,7 +263,6 @@ namespace ManageEmployeeSystem
                 txtUsername.Text = account.Username.ToString();
             }
         }
-
         private void GoHome_Click(object sender, RoutedEventArgs e)
         {
             if (employeeAdmin != null)
@@ -288,8 +284,6 @@ namespace ManageEmployeeSystem
             }
 
         }
-
-
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBox.Show("Bạn có chắc chắn muốn đăng xuất?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
@@ -300,7 +294,6 @@ namespace ManageEmployeeSystem
                 this.Close();
             }
         }
-
         private void UpdateProfile_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -491,7 +484,6 @@ namespace ManageEmployeeSystem
             Regex regex = new Regex(pattern);
             return regex.IsMatch(password);
         }
-
         private void Changepassword_Click(object sender, RoutedEventArgs e)
         {
             string password = txtOldpassword.Password;
@@ -553,7 +545,6 @@ namespace ManageEmployeeSystem
             txtNewpassword.Clear();
             txtRepassword.Clear();
         }
-
         private void cbbDepartment_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int departmentId = 0;
@@ -572,7 +563,6 @@ namespace ManageEmployeeSystem
                 }
             }
         }
-
         private void cbbManager_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int managerId = 0;
@@ -599,12 +589,10 @@ namespace ManageEmployeeSystem
                 }
             }
         }
-
         private void btnClear_Click(object sender, RoutedEventArgs e)
         {
             ClearForm();
         }
-
         private void btnAddEmployee_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -752,7 +740,6 @@ namespace ManageEmployeeSystem
                 MessageBox.Show("Lỗi thêm mới nhân viên!", "Thông báo");
             }
         }
-
         private void btnDeleteEmployee_Click(object sender, RoutedEventArgs e)
         {
             try

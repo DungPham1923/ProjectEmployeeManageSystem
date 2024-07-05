@@ -44,21 +44,25 @@
         </DataGrid>
 
         <StackPanel Grid.Row="13" Grid.Column="0" Grid.ColumnSpan="4" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Label Margin="10,5,10,5" FontSize="15">Tìm kiếm theo:</Label>
-            <ComboBox Name="cbbFilter" Width="150" Height="30" Margin="10,5,10,5" FontSize="15">
-                <ComboBoxItem Content="Tên nhân viên" Visibility="Collapsed" Name="cbbItemSearch"/>
+            <Label Margin="10,5,10,5" FontSize="15">Tìm kiếm:</Label>
+            <TextBox Name="txtDatasearch" Width="200" Height="30" FontSize="15" DataContextChanged="txtDatasearch_DataContextChanged"/>
+            <ComboBox Name="cbbFilter" Width="150" Height="30" Margin="10,5,10,5" FontSize="15" SelectionChanged="cbbFilter_SelectionChanged" >
+                <ComboBoxItem Content="Tên nhân viên"/>
                 <ComboBoxItem Content="Email"/>
                 <ComboBoxItem Content="Số điện thoại"/>
-                <ComboBoxItem Content="Giới tính"/>
-                <ComboBoxItem Content="Phòng ban"/>
-                <ComboBoxItem Content="Vị trí làm việc"/>
             </ComboBox>
-            <TextBox Name="txtDatasearch" Width="200" Height="30" FontSize="15" />
-            <Button Content="Tìm" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0" />
-            <Label Margin="10,5,10,5" FontSize="15">Trạng thái nhân viên:</Label>
+            
+            <!--<Button Content="Tìm" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0" />-->
+            <Label Margin="10,5,10,5" FontSize="15">Lọc nhân viên:</Label>
             <ComboBox Name="cbbFilterEmployeeStatus" Width="150" Height="30" Margin="10,5,10,5" FontSize="15" SelectionChanged="cbbFilterStatusEmployee_SelectionChanged">
-                <ComboBoxItem Content="Chưa xóa"/>
-                <ComboBoxItem Content="Đã xóa"/>
+                <ComboBoxItem Content="Đang hoạt động"/>
+                <ComboBoxItem Content="Ngừng hoạt động"/>
+                <ComboBoxItem Content="Nam"/>
+                <ComboBoxItem Content="Nữ"/>
+                <ComboBoxItem Content="Trưởng phòng"/>
+                <ComboBoxItem Content="Nhân viên chính"/>
+                <ComboBoxItem Content="Nhân viên partime"/>
+                <ComboBoxItem Content="Thực tập sinh"/>
             </ComboBox>
             <CheckBox x:Name="cbAllEmployee" Content="Tất cả nhân viên" FontSize="15" Width="160" Height="30" Margin="10,5,10,5" IsChecked="False" Padding="5" BorderThickness="12,8,12,8" Checked="cbAllEmployee_Checked" />
             <Button Content="Xem chi tiết" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0" Click="DetailEmployee_Click"/>
