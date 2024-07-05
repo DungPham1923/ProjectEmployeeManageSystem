@@ -69,6 +69,6 @@
             <Button Content="Thêm mới" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0" Click="AddNewEmployee_Click" />
         </StackPanel>
         <TextBox Name="txtEmployeeID" IsReadOnly="True" Grid.Row="115" Grid.Column="1" Height="30" FontSize="15" Margin="10,0,10,0" Visibility="Collapsed" Text="{Binding ElementName=dgEmployee, Path=SelectedItem.ID, Mode=OneWay}"/>
-
+        
     </Grid>
 </Window>

@@ -328,6 +328,7 @@ namespace ManageEmployeeSystem
             cbbSelectAssign.SelectedItem = null;
             txtAssignDate.SelectedDate = null;
             cbbSelectEmployee.SelectedItem = null;
+            txtEmployeeJobID.Clear();
         }
 
         private void UpdateJob_Click(object sender, RoutedEventArgs e)
@@ -438,8 +439,15 @@ namespace ManageEmployeeSystem
                 if (database.SaveChanges() > 0)
                 {
                     MessageBox.Show("Cập nhật dữ liệu công việc thành công!", "Thông báo");
-                    //LoadDataJobs();
-                    LoadIndiJobs();
+                    if(em.RoleId == 3)
+                    {
+                        LoadDataJobs();
+                    }
+                    else
+                    {
+                        LoadIndiJobs();
+                    }
+                    
                 }
                 else
                 {

@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:ManageEmployeeSystem"
              StartupUri="Login.xaml">
     <Application.Resources>
-         
+
     </Application.Resources>
 </Application>

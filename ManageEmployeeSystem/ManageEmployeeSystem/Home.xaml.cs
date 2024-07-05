@@ -78,11 +78,6 @@ namespace ManageEmployeeSystem
             this.Close();
         }
 
-        private void Department_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void EmployeeJobs_Click(object sender, RoutedEventArgs e)
         {
             EmployeeJobs employeejobs = new EmployeeJobs(em);
@@ -97,6 +92,14 @@ namespace ManageEmployeeSystem
             ManageEmployee manageEmployee = new ManageEmployee(em);
             this.Hide();
             manageEmployee.ShowDialog();
+            this.Close();
+        }
+
+        private void Department_Click(object sender, RoutedEventArgs e)
+        {
+            ManageDepartment manageDepartment = new ManageDepartment(em);
+            this.Hide();
+            manageDepartment.ShowDialog();
             this.Close();
         }
     }
