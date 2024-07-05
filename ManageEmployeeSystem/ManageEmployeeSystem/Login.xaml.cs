@@ -59,10 +59,16 @@ namespace ManageEmployeeSystem
                     MessageBox.Show("Tên đăng nhập không được để trống!", "Thông báo", MessageBoxButton.OK);
                     return;
                 }
-                Authentication account = database.Authentications.FirstOrDefault(a => a.Username.Equals(username) & a.PassWord.Equals(password));
+                Authentication account = database.Authentications.FirstOrDefault(a => a.Username.Equals(username) && a.PassWord.Equals(password));
                 if (account == null)
                 {
                     MessageBox.Show("Tài khoản không tồn tại!", "Thông báo", MessageBoxButton.OK);
+                    return;
+                }
+                else if (account.IsDelete == true)
+                {
+                    MessageBox.Show("Tài khoản của bạn đã bị khóa! Không thể đăng nhập!", "Thông báo", MessageBoxButton.OK);
+                    return;
                 }
                 else
                 {

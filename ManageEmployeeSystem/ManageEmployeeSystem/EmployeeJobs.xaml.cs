@@ -223,7 +223,7 @@ namespace ManageEmployeeSystem
                 {
                     var statusId = cbbFilterJobStatus.SelectedIndex + 1;
                     dgEmployeeJobs.ItemsSource = string.Empty;
-                    var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && j.Job.JobStatusId == statusId && j.EmployeeId == em.Id).Select(j => new
+                    var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && j.Job.JobStatusId == statusId && j.EmployeeId == em.Id && j.IsDelete == false).Select(j => new
                     {
                         ID = j.EmployeeJobId,
                         JobID = j.JobId,
@@ -243,7 +243,7 @@ namespace ManageEmployeeSystem
                 {
                     var statusId = cbbFilterJobStatus.SelectedIndex + 1;
                     dgEmployeeJobs.ItemsSource = string.Empty;
-                    var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && j.Job.JobStatusId == statusId).Select(j => new
+                    var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && j.Job.JobStatusId == statusId && j.IsDelete == false).Select(j => new
                     {
                         ID = j.EmployeeJobId,
                         JobID = j.JobId,
@@ -265,7 +265,7 @@ namespace ManageEmployeeSystem
             {
                 var statusId = cbbFilterJobStatus.SelectedIndex + 1;
                 dgEmployeeJobs.ItemsSource = string.Empty;
-                var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && j.Job.JobStatusId == statusId && j.EmployeeId == em.Id).Select(j => new
+                var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && j.Job.JobStatusId == statusId && j.EmployeeId == em.Id && j.IsDelete == false).Select(j => new
                 {
                     ID = j.EmployeeJobId,
                     JobID = j.JobId,
@@ -438,7 +438,8 @@ namespace ManageEmployeeSystem
                 if (database.SaveChanges() > 0)
                 {
                     MessageBox.Show("Cập nhật dữ liệu công việc thành công!", "Thông báo");
-                    LoadDataJobs();
+                    //LoadDataJobs();
+                    LoadIndiJobs();
                 }
                 else
                 {
@@ -598,7 +599,8 @@ namespace ManageEmployeeSystem
                 if (database.SaveChanges() > 0)
                 {
                     MessageBox.Show("Thêm mới công việc thành công!", "Thông báo");
-                    LoadDataJobs();
+                    //LoadDataJobs();
+                    LoadIndiJobs();
                 }
                 else
                 {
