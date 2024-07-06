@@ -501,7 +501,16 @@ namespace ManageEmployeeSystem
                         if (database.SaveChanges() > 0)
                         {
                             MessageBox.Show("Xóa dữ liệu công việc thành công!", "Thông báo");
-                            LoadDataJobs();
+                            //LoadDataJobs();
+                            if(em.RoleId == 2)
+                            {
+                                LoadIndiJobs();
+                            }
+                            else if(em.RoleId == 3)
+                            {
+                                LoadDataJobs();
+                            }
+                            
                         }
                     }
                 }

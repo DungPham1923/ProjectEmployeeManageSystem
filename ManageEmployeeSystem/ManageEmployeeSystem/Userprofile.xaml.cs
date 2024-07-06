@@ -183,66 +183,101 @@ namespace ManageEmployeeSystem
         private void LoadData(int Id)
         {
             var employee = database.Employees.Where(e => e.Id == Id).SingleOrDefault();
-            txtID.Text = employee.Id.ToString();
-            txtFirstname.Text = employee.FirstName.ToString();
-            txtLastname.Text = employee.LastName.ToString();
-            txtEmail.Text = employee.Email.ToString();
-            txtBirthdate.Text = employee.DateOfBirth.ToString();
-            txtAddress.Text = employee.Address.ToString();
-            txtPhone.Text = employee.Phone.ToString();
-
-            LoadDataSub();
-
-            var selectedDepartment = database.Departments.FirstOrDefault(d => d.Id == employee.DepartmentId);
-            if (selectedDepartment != null)
+            if (employee != null)
             {
-                cbbDepartment.SelectedItem = selectedDepartment;
+                txtID.Text = employee.Id.ToString();
+                if (employee.FirstName != null)
+                {
+                    txtFirstname.Text = employee.FirstName.ToString();
+                }
+                if (employee.LastName != null)
+                {
+                    txtLastname.Text = employee.LastName.ToString();
+                }
+                if (employee.Email != null)
+                {
+                    txtEmail.Text = employee.Email.ToString();
+                }
+                if (employee.Phone != null)
+                {
+                    txtPhone.Text = employee.Phone.ToString();
+                }
+                if (employee.DateOfBirth != null)
+                {
+                    txtBirthdate.Text = employee.DateOfBirth.ToString();
+                }
+                if (employee.Address != null)
+                {
+                    txtAddress.Text = employee.Address.ToString();
+                }
+
+                LoadDataSub();
+                if (employee.DeletedById != null)
+                {
+                    var selectedDepartment = database.Departments.FirstOrDefault(d => d.Id == employee.DepartmentId);
+                    if (selectedDepartment != null)
+                    {
+                        cbbDepartment.SelectedItem = selectedDepartment;
+                    }
+                }
+                if (employee.PositionId != null)
+                {
+                    var selectedPosition = database.Positions.FirstOrDefault(p => p.Id == employee.PositionId);
+                    if (selectedPosition != null)
+                    {
+                        cbbPosition.SelectedItem = selectedPosition;
+                    }
+                }
+                if (employee.ManagerId != null)
+                {
+                    var selectedManager = database.Employees.Select(m => new
+                    {
+                        ID = m.Id,
+                        Fullname = m.FirstName + " " + m.LastName,
+                    }).FirstOrDefault(m => m.ID == employee.ManagerId);
+                    if (selectedManager != null)
+                    {
+                        cbbManager.SelectedItem = selectedManager;
+                    }
+                }
+
+                if (employee.CreatedAt != null)
+                {
+                    txtCreatedAt.Text = employee.CreatedAt.ToString();
+                }
+                if (employee.Salary != null)
+                {
+                    string salary = FormatNumber((double)employee.Salary);
+                    txtSalary.Text = salary;//em.Salary.ToString();
+                }
+
+                //var position = database.Positions.FirstOrDefault(p => p.Id == employee.PositionId);
+
+
+                //var manager = database.Employees.FirstOrDefault(m => m.Id == employee.Id);
+
+                
+                bool gender = employee.Gender.HasValue && employee.Gender.Value;
+                if (gender == false)
+                {
+                    radioGirl.IsChecked = true;
+                }
+                else if (gender == true)
+                {
+                    radioBoy.IsChecked = true;
+                }
+
+                bool status = employee.IsDelete.HasValue && employee.IsDelete.Value;
+
+                if (status == false)
+                {
+                    radioActive.IsChecked = true;
+                }
+                else
+                {
+                    radioInactive.IsChecked = true;
+                }
             }
-            var selectedPosition = database.Positions.FirstOrDefault(p => p.Id == employee.PositionId);
-            if (selectedPosition != null)
-            {
-                cbbPosition.SelectedItem = selectedPosition;
-            }
-            var selectedManager = database.Employees.Select(m => new
-            {
-                ID = m.Id,
-                Fullname = m.FirstName + " " + m.LastName,
-            }).FirstOrDefault(m => m.ID == employee.ManagerId);
-            if (selectedManager != null)
-            {
-                cbbManager.SelectedItem = selectedManager;
-            }
-
-            txtCreatedAt.Text = employee.CreatedAt.ToString();
-            string salary = FormatNumber((double)employee.Salary);
-            txtSalary.Text = salary;//em.Salary.ToString();
-            var position = database.Positions.FirstOrDefault(p => p.Id == employee.PositionId);
-
-
-            var manager = database.Employees.FirstOrDefault(m => m.Id == employee.Id);
-
-
-            bool gender = employee.Gender.HasValue && employee.Gender.Value;
-            if (gender == false)
-            {
-                radioGirl.IsChecked = true;
-            }
-            else if (gender == true)
-            {
-                radioBoy.IsChecked = true;
-            }
-
-            bool status = employee.IsDelete.HasValue && employee.IsDelete.Value;
-
-            if (status == false)
-            {
-                radioActive.IsChecked = true;
-            }
-            else
-            {
-                radioInactive.IsChecked = true;
-            }
-
         }
         private void LoadDepartmentList()
         {
@@ -453,7 +488,7 @@ namespace ManageEmployeeSystem
                         employeeUpdate.DateOfBirth = dateofbirth;
                         employeeUpdate.Gender = gender;
                         employeeUpdate.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
-                        
+
                         database.Employees.Update(employeeUpdate);
                         if (database.SaveChanges() > 0)
                         {
@@ -614,10 +649,11 @@ namespace ManageEmployeeSystem
                     gender = false;
                 }
                 bool active = true;
-                if(radioActive.IsChecked == true)
+                if (radioActive.IsChecked == true)
                 {
                     active = false;
-                }else if (radioInactive.IsChecked == true)
+                }
+                else if (radioInactive.IsChecked == true)
                 {
                     active = true;
                 }
@@ -669,7 +705,7 @@ namespace ManageEmployeeSystem
                     newEmployee.IsDelete = active;
                     newEmployee.CreatedAt = DateOnly.FromDateTime(DateTime.Now);
                     newEmployee.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
-                    
+
                     database.Employees.Add(newEmployee);
                     database.SaveChanges();
 
@@ -703,7 +739,7 @@ namespace ManageEmployeeSystem
                     newEmployee.Address = address;
                     newEmployee.DateOfBirth = dateofbirth;
                     newEmployee.Gender = gender;
-                    newEmployee.Salary = (decimal) salary;
+                    newEmployee.Salary = (decimal)salary;
                     newEmployee.PositionId = idPosition;
                     newEmployee.DepartmentId = idDepartment;
                     newEmployee.ManagerId = idManager;
@@ -750,17 +786,17 @@ namespace ManageEmployeeSystem
                     return;
                 }
                 var employee = database.Employees.Where(e => e.Id == employeeId).SingleOrDefault();
-                if(employee != null)
+                if (employee != null)
                 {
-                    if(MessageBox.Show("Bạn có chắc chắn muốn xóa nhân viên " + employee.FirstName + " " + employee.LastName, "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    if (MessageBox.Show("Bạn có chắc chắn muốn xóa nhân viên " + employee.FirstName + " " + employee.LastName, "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
                         employee.IsDelete = true;
                         var authentication = database.Authentications.Where(a => a.EmployeeId == employee.Id).SingleOrDefault();
-                        if(authentication != null)
+                        if (authentication != null)
                         {
                             authentication.IsDelete = true;
                         }
-                        if(database.SaveChanges() > 0)
+                        if (database.SaveChanges() > 0)
                         {
                             MessageBox.Show("Đã xóa thành công nhân viên!", "Thông báo");
                             return;
@@ -777,7 +813,9 @@ namespace ManageEmployeeSystem
                     MessageBox.Show("Không tìm thấy nhân viên!", "Thông báo");
                     return;
                 }
-            }catch (Exception ex){
+            }
+            catch (Exception ex)
+            {
                 MessageBox.Show("Lỗi xóa nhân viên không thành công!", "Thông báo");
             }
         }

@@ -72,7 +72,7 @@
         
         <Label Grid.Row="11" Grid.Column="2" FontSize="20">Quản lí:</Label>
         <!--<TextBox Name="cbbManager" IsReadOnly="True" Grid.Row="11" Grid.Column="3" Height="30" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgDepartment,Path=SelectedItem.Manager, Mode=OneWay}"/>-->
-        <ComboBox Name="cbbManager" Width="462"  Grid.Row="11" Grid.Column="3" Height="30" Margin="10,0,10,0" FontSize="15" IsEnabled="False" SelectionChanged="cbbManager_SelectionChanged" ></ComboBox>
+        <ComboBox Name="cbbManager" Width="462"  Grid.Row="11" Grid.Column="3" Height="30" Margin="10,0,10,0" FontSize="15" IsEnabled="true" SelectionChanged="cbbManager_SelectionChanged" ></ComboBox>
 
 
         <Label Grid.Row="12" Grid.Column="2" FontSize="20">Email quản lý:</Label>
