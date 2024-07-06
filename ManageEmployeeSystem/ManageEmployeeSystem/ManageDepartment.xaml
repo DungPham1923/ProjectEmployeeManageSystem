@@ -45,24 +45,24 @@
         <StackPanel Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="4" Orientation="Horizontal" HorizontalAlignment="Center">
             <Label Margin="10,5,10,5" FontSize="15">Tìm kiếm:</Label>
             <TextBox Name="txtDatasearch" Width="200" Height="30" FontSize="15" />
-            <Button Content="Tìm" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0" />
+            <Button Content="Tìm" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0" Click="Search_Click" />
             
             <Label Margin="10,5,10,5" FontSize="15">Lọc:</Label>
-            <ComboBox Name="cbbFilterEmployeeStatus" Width="150" Height="30" Margin="10,5,10,5" FontSize="15">
+            <ComboBox Name="cbbFilterStatus" Width="150" Height="30" Margin="10,5,10,5" FontSize="15" SelectionChanged="cbbFilterEmployeeStatus_SelectionChanged" >
                 <ComboBoxItem Content="Đang hoạt động"/>
                 <ComboBoxItem Content="Ngừng hoạt động"/>
             </ComboBox>
-            <CheckBox x:Name="cbAllEmployee" Content="Tất cả phòng ban" FontSize="15" Width="170" Height="30" Margin="10,5,10,5" IsChecked="False" Padding="5" BorderThickness="12,8,12,8" />
+            <CheckBox x:Name="cbAllDepartment" Content="Tất cả phòng ban" FontSize="15" Width="170" Height="30" Margin="10,5,10,5" IsChecked="False" Padding="5" BorderThickness="12,8,12,8" Checked="cbAllEmployee_Checked" />
         </StackPanel>
         <Label Grid.Row="10" Grid.Column="0" FontSize="20" FontWeight="DemiBold">Chi tiết phòng ban:</Label>
         <Label Grid.Row="11" Grid.Column="0" FontSize="20">ID:</Label>
         <TextBox Name="txtDepartmentID" IsReadOnly="True" Grid.Row="11" Grid.Column="1" Height="30" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgDepartment,Path=SelectedItem.DepartmentID, Mode=OneWay}"/>
 
         <Label Grid.Row="12" Grid.Column="0" FontSize="20">Phòng ban: </Label>
-        <TextBox Name="txtDepartmentName" IsReadOnly="True" Grid.Row="12" Grid.Column="1" Height="30" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgDepartment,Path=SelectedItem.Name, Mode=OneWay}"/>
+        <TextBox Name="txtDepartmentName" Grid.Row="12" Grid.Column="1" Height="30" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgDepartment,Path=SelectedItem.Name, Mode=OneWay}"/>
         
         <Label Grid.Row="13" Grid.Column="0" FontSize="20">Mô tả: </Label>
-        <TextBox Name="txtDescription" IsReadOnly="True" Grid.Row="13" Grid.Column="1" Height="30" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgDepartment,Path=SelectedItem.Description, Mode=OneWay}"/>
+        <TextBox Name="txtDescription" Grid.Row="13" Grid.Column="1" Height="30" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgDepartment,Path=SelectedItem.Description, Mode=OneWay}"/>
 
         <Label Grid.Row="14" Grid.Column="0" FontSize="20">Trạng thái hoạt động</Label>
         <StackPanel Grid.Row="14" Grid.Column="1" Orientation="Horizontal" >
@@ -72,11 +72,11 @@
         
         <Label Grid.Row="11" Grid.Column="2" FontSize="20">Quản lí:</Label>
         <!--<TextBox Name="cbbManager" IsReadOnly="True" Grid.Row="11" Grid.Column="3" Height="30" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgDepartment,Path=SelectedItem.Manager, Mode=OneWay}"/>-->
-        <ComboBox Name="cbbManager" Width="462"  Grid.Row="11" Grid.Column="3" Height="30" Margin="10,0,10,0" FontSize="15"></ComboBox>
+        <ComboBox Name="cbbManager" Width="462"  Grid.Row="11" Grid.Column="3" Height="30" Margin="10,0,10,0" FontSize="15" IsEnabled="False" SelectionChanged="cbbManager_SelectionChanged" ></ComboBox>
 
 
         <Label Grid.Row="12" Grid.Column="2" FontSize="20">Email quản lý:</Label>
-        <TextBox Name="txtEmail" IsReadOnly="True" Grid.Row="12" Grid.Column="3" Height="30" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgDepartment,Path=SelectedItem.ManagerEmail, Mode=OneWay}"/>
+        <TextBox Name="txtEmail" Grid.Row="12" Grid.Column="3" Height="30" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgDepartment,Path=SelectedItem.ManagerEmail, Mode=OneWay}"/>
 
         <Label Grid.Row="13" Grid.Column="2" FontSize="20">Ngày tạo:</Label>
         <TextBox Name="dpCreatedAt" IsReadOnly="True" Grid.Row="13" Grid.Column="3" Height="30" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgDepartment,Path=SelectedItem.CreatedAt, Mode=OneWay}"/>
@@ -85,10 +85,10 @@
         <TextBox Name="dpUpdatedAt" IsReadOnly="True" Grid.Row="14" Grid.Column="3" Height="30" FontSize="15" Margin="10,0,10,0" Text="{Binding ElementName=dgDepartment,Path=SelectedItem.UpdatedAt, Mode=OneWay}"/>
 
         <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.Row="15" Grid.ColumnSpan="2" HorizontalAlignment="Center">
-            <Button Name="btnUpdateEmployee" Content="Câp nhật" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" HorizontalAlignment="Right" Margin="0,0,18,0"  />
-            <Button Name="btnAddEmployee" Content="Thêm" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" HorizontalAlignment="Right" Margin="0,0,18,0"  />
-            <Button Name="btnDeleteEmployee" Content="Xóa" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" HorizontalAlignment="Right" Margin="0,0,18,0"  />
-            <Button Name="btnClear" Content="Làm mới" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" HorizontalAlignment="Right" Margin="0,0,18,0"  />
+            <Button Name="btnUpdateDepartment" Content="Câp nhật" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" HorizontalAlignment="Right" Margin="0,0,18,0" Click="btnUpdateDepartment_Click" />
+            <Button Name="btnAddDepartment" Content="Thêm" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" HorizontalAlignment="Right" Margin="0,0,18,0" Click="btnAddDepartment_Click"  />
+            <Button Name="btnDeleteDepartment" Content="Xóa" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" HorizontalAlignment="Right" Margin="0,0,18,0" Click="btnDeleteDepartment_Click"  />
+            <Button Name="btnClear" Content="Làm mới" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" HorizontalAlignment="Right" Margin="0,0,18,0" Click="btnClear_Click"  />
         </StackPanel>
 
     </Grid>

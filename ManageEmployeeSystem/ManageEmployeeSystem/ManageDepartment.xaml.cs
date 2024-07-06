@@ -1,5 +1,6 @@
 ﻿using ManageEmployeeSystem.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -157,13 +158,17 @@ namespace ManageEmployeeSystem
                     ID = e.Id,
                     Fullname = e.FirstName + " " + e.LastName,
                 }).FirstOrDefault();
-                
-                if(manager != null)
+
+                if (manager != null)
                 {
                     cbbManager.SelectedItem = manager;
                 }
                 var manager2 = database.Employees.Where(m => m.RoleId == 3 && m.DepartmentId == idDepartment).FirstOrDefault();
-                txtEmail.Text = manager2.Email;
+                if (manager2 != null)
+                {
+                    txtEmail.Text = manager2.Email;
+                }
+
             }
             else
             {
@@ -172,5 +177,293 @@ namespace ManageEmployeeSystem
 
         }
 
+        private void btnClear_Click(object sender, RoutedEventArgs e)
+        {
+            txtDepartmentID.Clear();
+            txtDepartmentName.Clear();
+            txtEmail.Clear();
+            txtDescription.Clear();
+            dpCreatedAt.Clear();
+            dpUpdatedAt.Clear();
+            cbbManager.SelectedIndex = -1;
+        }
+
+        private void cbbManager_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int managerId = 0;
+            var manager = cbbManager.SelectedItem as dynamic;
+            if (manager != null)
+            {
+                managerId = manager.ID;
+                var employee = database.Employees.FirstOrDefault(emp => emp.Id == managerId);
+                if (employee != null)
+                {
+                    txtEmail.Text = employee.Email;
+                }
+                else
+                {
+                    MessageBox.Show("Không thể tìm thấy email của nhân viên " + manager.Fullname, "Thông báo");
+                }
+            }
+        }
+
+        private void btnUpdateDepartment_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (!int.TryParse(txtDepartmentID.Text, out int Id))
+                {
+                    MessageBox.Show("Không xử lí được ID phòng ban!", "Thông báo");
+                    return;
+                }
+                string name = txtDepartmentName.Text;
+                string description = txtDescription.Text;
+                bool isDelete = true;
+                if (radioActive.IsChecked == true)
+                {
+                    isDelete = false;
+                }
+                else if (radioInactive.IsChecked == true)
+                {
+                    isDelete = true;
+                }
+                //DateOnly updatedAt = DateOnly.Parse(DateTime.Now());
+
+                var departmentUpdate = database.Departments.SingleOrDefault(d => d.Id == Id);
+                if (departmentUpdate != null)
+                {
+                    departmentUpdate.Name = name;
+                    departmentUpdate.Description = description;
+                    departmentUpdate.IsDelete = isDelete;
+                    departmentUpdate.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
+                    database.Departments.Update(departmentUpdate);
+                    if (database.SaveChanges() > 0)
+                    {
+                        MessageBox.Show("Cập nhật thông tin phòng ban thành công!", "Thông báo");
+                        LoadDataDepartment();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Cập nhật thông tin phòng ban thất bại", "Thông báo");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Không thể tìm thấy phòng ban này!", "Thông báo");
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi cập nhật phòng ban!" + ex.Message, "Thông báo");
+                return;
+            }
+        }
+
+        private void Search_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string datasearch = txtDatasearch.Text;
+                if (datasearch.IsNullOrEmpty())
+                {
+                    MessageBox.Show("Vui lòng điền gợi í tìm kiếm!", "Thông báo");
+                    return;
+                }
+                var department = database.Departments.Where(d => d.Name.ToLower().Contains(datasearch) || d.Description.ToLower().Contains(datasearch)).Select(d => new
+                {
+                    DepartmentID = d.Id,
+                    Name = d.Name,
+                    Description = d.Description,
+                    CreatedAt = d.CreatedAt,
+                    UpdatedAt = d.UpdatedAt,
+                    Status = d.IsDelete,
+                }).ToList();
+                if (department != null)
+                {
+                    dgDepartment.ItemsSource = department;
+                    cbAllDepartment.IsChecked = false;
+                }
+                else
+                {
+                    MessageBox.Show("Không tìm thấy phòng ban!", "Thông báo");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi tìm kiếm " + ex.Message, "Thông báo");
+            }
+        }
+
+        private void cbAllEmployee_Checked(object sender, RoutedEventArgs e)
+        {
+            if (cbAllDepartment.IsChecked == true)
+            {
+                LoadDataDepartment();
+            }
+        }
+
+        private void cbbFilterEmployeeStatus_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cbbFilterStatus.Items == null)
+            {
+                return;
+            }
+            if (cbbFilterStatus.SelectedIndex == 0)
+            {
+                var department = database.Departments.Where(d => d.IsDelete == false).Select(d => new
+                {
+                    DepartmentID = d.Id,
+                    Name = d.Name,
+                    Description = d.Description,
+                    CreatedAt = d.CreatedAt,
+                    UpdatedAt = d.UpdatedAt,
+                    Status = d.IsDelete,
+                }).ToList();
+                if (department.Any())
+                {
+                    dgDepartment.ItemsSource = department;
+                    cbAllDepartment.IsChecked = false;
+                }
+                else
+                {
+                    MessageBox.Show("Không có phòng ban nào hoạt động!", "Thông báo");
+                    return;
+                }
+
+            }
+            if (cbbFilterStatus.SelectedIndex == 1)
+            {
+                var department = database.Departments.Where(d => d.IsDelete == true).Select(d => new
+                {
+                    DepartmentID = d.Id,
+                    Name = d.Name,
+                    Description = d.Description,
+                    CreatedAt = d.CreatedAt,
+                    UpdatedAt = d.UpdatedAt,
+                    Status = d.IsDelete,
+                }).ToList();
+                if (department.Any())
+                {
+                    dgDepartment.ItemsSource = department;
+                    cbAllDepartment.IsChecked = false;
+                }
+                else
+                {
+                    MessageBox.Show("Không có phòng ban nào ngừng hoạt động!", "Thông báo");
+                    return;
+                }
+            }
+        }
+
+        private void btnAddDepartment_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string name = txtDepartmentName.Text;
+                string description = txtDescription.Text;
+                bool isDelete = true;
+                if (radioActive.IsChecked == true)
+                {
+                    isDelete = false;
+                }
+                else if (radioInactive.IsChecked == true)
+                {
+                    isDelete = true;
+                }
+                Department department = new Department();
+                department.Name = name;
+                department.Description = description;
+                department.IsDelete = isDelete;
+                department.CreatedAt = DateOnly.FromDateTime(DateTime.Now);
+                department.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
+                database.Departments.Add(department);
+                if (database.SaveChanges() > 0)
+                {
+                    MessageBox.Show("Thêm mới phòng ban thành công!", "Thông báo");
+                    LoadDataDepartment();
+                }
+                else
+                {
+                    MessageBox.Show("Thêm mới phòng ban thất bại", "Thông báo");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi thêm mới phòng ban!" + ex.Message, "Thông báo");
+                return;
+            }
+
+        }
+
+        private void btnDeleteDepartment_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (!int.TryParse(txtDepartmentID.Text, out int Id))
+                {
+                    MessageBox.Show("Lỗi xử lí ID!", "Thông báo");
+                    return;
+                }
+                var department = database.Departments.SingleOrDefault(d => d.Id == Id);
+                if (department != null)
+                {
+                    var employee = database.Employees.Where(e => e.DepartmentId == Id).ToList();
+                    var job = database.Jobs.Where(j =>j.DepartmentId == Id).ToList();
+                    if (employee.Count != 0)
+                    {
+                        if (MessageBox.Show("Xóa phòng " + department.Name + " sẽ làm cho các nhân viên hiện tại của phòng ban này không có phòng làm việc và xóa hết công việc của phòng này! Chắc chắn muốn xóa phòng " + department.Name + " ?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        {
+                            employee.ForEach(e => { e.DepartmentId = null; });
+                            employee.ForEach(e => database.Employees.Update(e));
+
+                            job.ForEach(j => { j.DepartmentId = null; });
+                            job.ForEach(j => database.Jobs.Update(j));
+                            database.Departments.Remove(department);
+                            if (database.SaveChanges() > 0)
+                            {
+                                MessageBox.Show("Xóa phòng ban thành công!", "Thông báo");
+                                LoadDataDepartment();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Xóa phòng ban thất bại!", "Thông báo");
+                                return;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (MessageBox.Show("Bạn chắc chắn muốn xóa phòng " + department.Name + " ?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        {
+                            database.Departments.Remove(department);
+                            if (database.SaveChanges() > 0)
+                            {
+                                MessageBox.Show("Xóa phòng ban thành công!", "Thông báo");
+                                LoadDataDepartment();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Xóa phòng ban thất bại!", "Thông báo");
+                                return;
+                            }
+                        }
+                    }
+
+
+                }
+                else
+                {
+                    MessageBox.Show("Không tìm thấy phòng ban trong hệ thông!", "Thông báo");
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message, "Thông báo");
+                return;
+            }
+        }
     }
 }
