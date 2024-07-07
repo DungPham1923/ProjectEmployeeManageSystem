@@ -159,9 +159,13 @@ namespace ManageEmployeeSystem
                     Fullname = e.FirstName + " " + e.LastName,
                 }).FirstOrDefault();
 
-                if (manager != null)
+                if (manager != null && manager.Fullname != null)
                 {
                     cbbManager.SelectedItem = manager;
+                }
+                else
+                {
+                    cbbManager.SelectedIndex = -1;
                 }
                 var manager2 = database.Employees.Where(m => m.RoleId == 3 && m.DepartmentId == idDepartment).FirstOrDefault();
                 if (manager2 != null)
@@ -211,7 +215,7 @@ namespace ManageEmployeeSystem
         {
             try
             {
-                if (!int.TryParse(txtDepartmentID.Text, out int Id))
+                if (!int.TryParse(txtDepartmentID.Text, out int departmentId))
                 {
                     MessageBox.Show("Không xử lí được ID phòng ban!", "Thông báo");
                     return;
@@ -228,8 +232,82 @@ namespace ManageEmployeeSystem
                     isDelete = true;
                 }
                 //DateOnly updatedAt = DateOnly.Parse(DateTime.Now());
+                if(cbbManager.SelectedItem != null)
+                {
+                    int idEmployee= 0;
+                    var manager = cbbManager.SelectedItem as dynamic;
+                    if (manager != null)
+                    {
+                        idEmployee = manager.ID;
+                    }
+                    var manageFuture = database.Employees.FirstOrDefault(e => e.Id == idEmployee);
+                    var manageCurrent = database.Employees.FirstOrDefault(e => e.DepartmentId == departmentId && e.RoleId == 3); //trưởng phòng của phòng này
+                    if (manageFuture != null && manageCurrent != null)
+                    {
+                        if(manageFuture != manageCurrent && manageFuture.RoleId != 3) //nếu nhân viên được chọn không phải trưởng phỏng của phòng này và cũng không phải trưởng phòng 
+                        {
+                            if(MessageBox.Show("Thay thế trưởng phòng \"" + manageCurrent.FirstName + " " + manageCurrent.LastName + "\" thành \"" + manageFuture.FirstName + " " + manageFuture.LastName + "\"?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                            {
+                                //Bãi nhiệm:
+                                manageCurrent.PositionId = null;
+                                manageCurrent.RoleId = 2; //role nhân viên
+                                manageCurrent.ManagerId = manageFuture.Id;
+                                database.Employees.Update(manageCurrent); 
 
-                var departmentUpdate = database.Departments.SingleOrDefault(d => d.Id == Id);
+                                //Lên chức:
+                                manageFuture.DepartmentId = departmentId; //chuyển phòng
+                                manageFuture.RoleId = 3; //cấp quyền trưởng phòng
+                                manageFuture.PositionId = 1; //trưởng phòng
+                                manageFuture.ManagerId = manageFuture.Id;
+                                database.Employees.Update(manageFuture);
+
+                                //tất cả nhân viên phòng hiện tại có quản lí mới
+                                var employeeOfDepart = database.Employees.Where(e => e.DepartmentId == departmentId).ToList();
+                                employeeOfDepart.ForEach(e => e.ManagerId = manageFuture.Id);
+                                employeeOfDepart.ForEach(e =>  database.Employees.Update(e));
+
+                            }
+                            else
+                            {
+                                return;
+                            }
+                        }
+                        else if (manageFuture != manageCurrent && manageFuture.RoleId == 3)// khác và cũng là trưởng phòng
+                        {
+                            if(MessageBox.Show("\"" + manageFuture.FirstName + " " + manageFuture.LastName+"\" hiện đang là trưởng phòng của phòng của 1 phòng ban khác, xác nhận thay thế ?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                            {
+                                //Bãi nhiệm:
+                                manageCurrent.PositionId = null;
+                                manageCurrent.RoleId = 2; //role nhân viên
+                                manageCurrent.ManagerId = manageFuture.Id;
+                                database.Employees.Update(manageCurrent);
+
+                                //tất cả nhiên viên ở phòng của trưởng phòng mới bị mất trưởng phòng
+                                var employeeOfDepartOfManageFuture = database.Employees.Where(e => e.DepartmentId == manageFuture.DepartmentId).ToList();
+                                employeeOfDepartOfManageFuture.ForEach(e => e.ManagerId = null);
+                                employeeOfDepartOfManageFuture.ForEach(e => database.Employees.Update(e));
+
+                                //Lên chức:
+                                manageFuture.DepartmentId = departmentId; //chuyển phòng
+                                manageFuture.ManagerId = manageFuture.Id;
+                                database.Employees.Update(manageFuture);
+
+
+                                //tất cả nhân viên phòng hiện tại có quản lí mới
+                                var employeeOfDepart = database.Employees.Where(e => e.DepartmentId == departmentId).ToList();
+                                employeeOfDepart.ForEach(e => e.ManagerId = manageFuture.Id);
+                                employeeOfDepart.ForEach(e => database.Employees.Update(e));
+       
+                            }
+                            else
+                            {
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                var departmentUpdate = database.Departments.SingleOrDefault(d => d.Id == departmentId);
                 if (departmentUpdate != null)
                 {
                     departmentUpdate.Name = name;

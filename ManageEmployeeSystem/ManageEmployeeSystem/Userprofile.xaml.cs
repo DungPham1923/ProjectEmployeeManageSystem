@@ -112,7 +112,7 @@ namespace ManageEmployeeSystem
         private void LoadDataSub()
         {
             var employee = database.Employees.Where(e => e.Id == em.Id).SingleOrDefault();
-            if (employeeAdmin != null)
+            if (employeeAdmin != null) //load hết
             {
                 var departments = database.Departments.ToList();
                 cbbDepartment.ItemsSource = departments;
@@ -133,7 +133,7 @@ namespace ManageEmployeeSystem
                 cbbManager.DisplayMemberPath = "Fullname";
                 cbbManager.SelectedValuePath = "ID";
             }
-            else
+            else //load objects current
             {
                 if (em != null)
                 {
@@ -212,7 +212,7 @@ namespace ManageEmployeeSystem
                 }
 
                 LoadDataSub();
-                if (employee.DeletedById != null)
+                if (employee.DepartmentId != null)
                 {
                     var selectedDepartment = database.Departments.FirstOrDefault(d => d.Id == employee.DepartmentId);
                     if (selectedDepartment != null)
@@ -371,9 +371,19 @@ namespace ManageEmployeeSystem
                         return;
                     }
                     var selectedDepartment = cbbDepartment.SelectedItem as Department;
+                    if (selectedDepartment == null)
+                    {
+                        MessageBox.Show("Vui lòng lựa chọn phòng ban!", "Thông báo");
+                        return;
+                    }
                     int idDepartment = selectedDepartment.Id;
 
                     var selectedPosition = cbbPosition.SelectedItem as Position;
+                    if(selectedPosition == null)
+                    {
+                        MessageBox.Show("Vui lòng lựa chọn vị trí công việc!", "Thông báo");
+                        return ;
+                    }
                     int idPosition = selectedPosition.Id;
 
                     if (idPosition == 1 && em.PositionId != 1 && em.ManagerId != em.Id) //nếu nó không phải là trưởng phòng và quản lí cũng khác nó
@@ -382,7 +392,16 @@ namespace ManageEmployeeSystem
                         {
                             //cho thằng trưởng phòng hiện tại thành nhân viên và chịu sự trách nhiệm quả lí của thằng được xếp làm trường phòng
                             var changeManager = database.Employees.Where(e => e.Id == em.ManagerId).SingleOrDefault();
-                            var changeManagerEmployee = database.Employees.Where(e => e.ManagerId == changeManager.Id).ToList();
+                            List<Employee> changeManagerEmployee = new List<Employee>();
+                            if (changeManager != null) //nếu nó có quản lí
+                            {
+                                changeManagerEmployee = database.Employees.Where(e => e.ManagerId == changeManager.Id).ToList();
+                            }
+                            else
+                            {
+                                changeManagerEmployee = database.Employees.Where(e => e.DepartmentId == idDepartment).ToList();
+                            }
+                            
                             if (changeManager != null)
                             {
                                 changeManager.PositionId = null;
