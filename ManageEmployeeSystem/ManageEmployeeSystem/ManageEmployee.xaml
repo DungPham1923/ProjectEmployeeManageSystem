@@ -46,7 +46,7 @@
 
         <StackPanel Grid.Row="13" Grid.Column="0" Grid.ColumnSpan="4" Orientation="Horizontal" HorizontalAlignment="Center">
             <Label Margin="10,5,10,5" FontSize="15">Tìm kiếm:</Label>
-            <TextBox Name="txtDatasearch" Width="200" Height="30" FontSize="15" DataContextChanged="txtDatasearch_DataContextChanged"/>
+            <TextBox Name="txtDatasearch" Width="200" Height="30" FontSize="15" TextChanged="txtDatasearch_TextChanged"/>
             <ComboBox Name="cbbFilter" Width="150" Height="30" Margin="10,5,10,5" FontSize="15" SelectionChanged="cbbFilter_SelectionChanged" >
                 <ComboBoxItem Content="Tên nhân viên"/>
                 <ComboBoxItem Content="Email"/>

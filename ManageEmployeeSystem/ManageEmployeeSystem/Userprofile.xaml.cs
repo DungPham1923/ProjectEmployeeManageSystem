@@ -63,6 +63,8 @@ namespace ManageEmployeeSystem
                 this.Title = "Xin chào admin, " + employeeAdmin.FirstName + " " + employeeAdmin.LastName;
                 //btnAddEmployee.Visibility = Visibility.Visible;
                 btnDeleteEmployee.Visibility = Visibility.Visible;
+                btnReset.Visibility = Visibility.Visible;
+                addFromFile.Visibility = Visibility.Collapsed;
                 txtSalary.IsReadOnly = false;
             }
             else
@@ -74,6 +76,8 @@ namespace ManageEmployeeSystem
                 btnAddEmployee.Visibility = Visibility.Visible;
                 btnDeleteEmployee.Visibility = Visibility.Collapsed;
                 btnUpdateEmployee.Visibility = Visibility.Collapsed;
+                btnReset.Visibility = Visibility.Collapsed;
+                btnAddFromfile.Visibility = Visibility.Visible;
 
                 ClearForm();
                 lbInfoLogin.Visibility = Visibility.Collapsed;
@@ -551,54 +555,62 @@ namespace ManageEmployeeSystem
             string password = txtOldpassword.Password;
             string newpassword = txtNewpassword.Password;
             string repassword = txtRepassword.Password;
-            if (password.IsNullOrEmpty()) { MessageBox.Show("Vui lòng điền mật khẩu!", "Thông báo"); return; }
+            if(employeeAdmin == null)
+            {
+                if (password.IsNullOrEmpty()) { MessageBox.Show("Vui lòng điền mật khẩu!", "Thông báo"); return; }
+            }
             if (newpassword.IsNullOrEmpty()) { MessageBox.Show("Vui lòng điền mật khẩu mới!", "Thông báo"); return; }
             if (repassword.IsNullOrEmpty()) { MessageBox.Show("Vui lòng điền xác nhận mật khẩu!", "Thông báo"); return; }
 
             var authentication = database.Authentications.SingleOrDefault(a => a.EmployeeId == em.Id);
-            if (password.Equals(authentication.PassWord))
+
+            if (employeeAdmin == null)
             {
-                if (!IsPasswordValid(newpassword))
+                if (authentication != null)
                 {
-                    MessageBox.Show("Mật khẩu bao gồm ít nhất 1 kí tự hoa, 1 kí tự thường, 1 kí tự số!", "Thông báo");
+                    if (!password.Equals(authentication.PassWord))
+                    {
+                        MessageBox.Show("Mật khẩu cũ không chính xác!", "Thông báo");
+                        return;
+                    }
+                }
+            }
+
+            if (!IsPasswordValid(newpassword))
+            {
+                MessageBox.Show("Mật khẩu bao gồm ít nhất 1 kí tự hoa, 1 kí tự thường, 1 kí tự số!", "Thông báo");
+                return;
+            }
+            else
+            {
+                if (!newpassword.Equals(repassword))
+                {
+                    MessageBox.Show("Vui lòng điền 'Mật khẩu' giống với 'Xác nhận mật khẩu'!", "Thông báo");
                     return;
                 }
                 else
                 {
-                    if (!newpassword.Equals(repassword))
+                    if (authentication != null)
                     {
-                        MessageBox.Show("Vui lòng điền 'Mật khẩu' giống với 'Xác nhận mật khẩu'!", "Thông báo");
-                        return;
+                        if (MessageBox.Show("Bạn chắc chắn muốn đổi mật khẩu?", "Thông bảo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        {
+                            authentication.PassWord = newpassword;
+                            if (database.SaveChanges() > 0)
+                            {
+                                MessageBox.Show("Cập nhật mật khẩu thành công!", "Thông báo");
+                                ClearChangePassWord();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Cập nhật mật khẩu không thành công!", "Thông báo");
+                            }
+                        }
                     }
                     else
                     {
-                        if (authentication != null)
-                        {
-                            if (MessageBox.Show("Bạn chắc chắn muốn đổi mật khẩu?", "Thông bảo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                            {
-                                authentication.PassWord = newpassword;
-                                if (database.SaveChanges() > 0)
-                                {
-                                    MessageBox.Show("Cập nhật mật khẩu thành công!", "Thông báo");
-                                    ClearChangePassWord();
-                                }
-                                else
-                                {
-                                    MessageBox.Show("Cập nhật mật khẩu không thành công!", "Thông báo");
-                                }
-                            }
-                        }
-                        else
-                        {
-                            MessageBox.Show("Lỗi không tìm thấy tài khoản cho người dùng này, vui lòng thử lại sau!", "Thông báo");
-                        }
+                        MessageBox.Show("Lỗi không tìm thấy tài khoản cho người dùng này, vui lòng thử lại sau!", "Thông báo");
                     }
                 }
-            }
-            else
-            {
-                MessageBox.Show("Mật khẩu cũ không chính xác!", "Thông báo");
-                return;
             }
         }
         private void ClearChangePassWord()
@@ -865,6 +877,57 @@ namespace ManageEmployeeSystem
                     home.ShowDialog();
                     this.Close();
                 }
+            }
+        }
+
+        private void Resetpassword_Click(object sender, RoutedEventArgs e)
+        {
+            var authentication = database.Authentications.SingleOrDefault(a => a.EmployeeId == em.Id);
+            if(authentication != null)
+            {
+                authentication.PassWord = "12345678";
+                database.Authentications.Update(authentication);
+                if(database.SaveChanges() > 0)
+                {
+                    MessageBox.Show("Reset mật khẩu cho nhân viên \"" + em.FirstName + " " + em.LastName + "\" thành công!","Thông báo" );
+                }
+                else
+                {
+                    MessageBox.Show("Reset mật khẩu cho nhân viên \"" + em.FirstName + " " + em.LastName + "\" thất bại!", "Thông báo");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Không tìm thấy tài khoản đăng nhập cho người dùng này!", "Thông báo");
+            }
+        }
+        bool display = true;
+        private void btnAddFromfile_Click(object sender, RoutedEventArgs e)
+        {
+            if (!display)
+            {
+                addFromFile.Visibility = Visibility.Visible;
+                display = true;
+            }
+            else
+            {
+                addFromFile.Visibility = Visibility.Collapsed;
+                display = false;
+            }
+        }
+
+        private void OpenFile_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            openFileDialog.Filter = "Excel Files (*.xls;*.xlsx)|*.xls;*.xlsx|All files (*.*)|*.*";
+            openFileDialog.Title = "Chọn tệp Excel";
+
+            bool? result = openFileDialog.ShowDialog();
+
+            if (result == true)
+            {
+                string filename = openFileDialog.FileName;
+                ///ImportEmployeesFromJson(filename);
             }
         }
     }

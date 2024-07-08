@@ -439,7 +439,7 @@ namespace ManageEmployeeSystem
                 if (database.SaveChanges() > 0)
                 {
                     MessageBox.Show("Cập nhật dữ liệu công việc thành công!", "Thông báo");
-                    if(em.RoleId == 3)
+                    if (em.RoleId == 3)
                     {
                         LoadDataJobs();
                     }
@@ -447,7 +447,7 @@ namespace ManageEmployeeSystem
                     {
                         LoadIndiJobs();
                     }
-                    
+
                 }
                 else
                 {
@@ -502,15 +502,15 @@ namespace ManageEmployeeSystem
                         {
                             MessageBox.Show("Xóa dữ liệu công việc thành công!", "Thông báo");
                             //LoadDataJobs();
-                            if(em.RoleId == 2)
+                            if (em.RoleId == 2)
                             {
                                 LoadIndiJobs();
                             }
-                            else if(em.RoleId == 3)
+                            else if (em.RoleId == 3)
                             {
                                 LoadDataJobs();
                             }
-                            
+
                         }
                     }
                 }
@@ -632,7 +632,7 @@ namespace ManageEmployeeSystem
 
         private void Search_Click(object sender, RoutedEventArgs e)
         {
-            if(cbbFilter.SelectedIndex == -1)
+            if (cbbFilter.SelectedIndex == -1)
             {
                 MessageBox.Show("Vui lòng lựa chọn loại tìm kiếm!", "Thông báo");
                 return;
@@ -642,7 +642,7 @@ namespace ManageEmployeeSystem
                 MessageBox.Show("Vui lòng nhập từ khóa tìm kiếm!", "Thông báo");
                 return;
             }
-            if(cbbFilter.SelectedIndex == 0)
+            if (cbbFilter.SelectedIndex == 0)
             {
                 var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && (j.Employee.FirstName + " " + j.Employee.LastName).ToLower().Contains(txtDatasearch.Text.ToLower())).Select(j => new
                 {
@@ -668,7 +668,7 @@ namespace ManageEmployeeSystem
                     return;
                 }
             }
-            else if(cbbFilter.SelectedIndex == 1)
+            else if (cbbFilter.SelectedIndex == 1)
             {
                 var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && j.Job.Title.ToLower().Contains(txtDatasearch.Text)).Select(j => new
                 {
@@ -696,9 +696,9 @@ namespace ManageEmployeeSystem
                     return;
                 }
             }
-            else if(cbbFilter.SelectedIndex == 2)
+            else if (cbbFilter.SelectedIndex == 2)
             {
-                var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && (j.Job.AssignedByNavigation.FirstName + " " + j.Job.AssignedByNavigation.LastName).ToLower().Contains(txtDatasearch.Text.ToLower()) ).Select(j => new
+                var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && (j.Job.AssignedByNavigation.FirstName + " " + j.Job.AssignedByNavigation.LastName).ToLower().Contains(txtDatasearch.Text.ToLower())).Select(j => new
                 {
                     ID = j.EmployeeJobId,
                     JobID = j.JobId,
@@ -732,6 +732,185 @@ namespace ManageEmployeeSystem
             this.Hide();
             home.ShowDialog();
             this.Close();
+        }
+
+        private void txtDatasearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            cbbFilter.SelectedIndex = -1;
+        }
+
+        private void cbbFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (em.RoleId == 2)
+            {
+                if (cbbFilter.SelectedIndex == 0)
+                {
+                    var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && (j.Employee.FirstName + " " + j.Employee.LastName).ToLower().Contains(txtDatasearch.Text.ToLower()) && j.EmployeeId == em.Id).Select(j => new
+                    {
+                        ID = j.EmployeeJobId,
+                        JobID = j.JobId,
+                        JobName = j.Job.Title,
+                        Description = j.Job.Description,
+                        EmployeeName = j.Employee.FirstName + " " + j.Employee.LastName,
+                        AssignBy = j.Job.AssignedByNavigation.FirstName + " " + j.Job.AssignedByNavigation.LastName,
+                        StartDate = j.Job.StartDate,
+                        EndDate = j.Job.EndDate,
+                        AssigmentDate = j.AssignmentDate,
+                        Status = j.Job.JobStatus.Name,
+                    }).ToList();
+                    if (job.Any())
+                    {
+                        dgEmployeeJobs.ItemsSource = job.ToList();
+                        cbAllJob.IsChecked = false;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Không tìm thấy nhân viên có tên : " + txtDatasearch.Text, "Thông báo");
+                        return;
+                    }
+                }
+                else if (cbbFilter.SelectedIndex == 1)
+                {
+                    var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && j.Job.Title.ToLower().Contains(txtDatasearch.Text) && j.EmployeeId == em.Id).Select(j => new
+                    {
+                        ID = j.EmployeeJobId,
+                        JobID = j.JobId,
+                        JobName = j.Job.Title,
+                        Description = j.Job.Description,
+                        EmployeeName = j.Employee.FirstName + " " + j.Employee.LastName,
+                        AssignBy = j.Job.AssignedByNavigation.FirstName + " " + j.Job.AssignedByNavigation.LastName,
+                        StartDate = j.Job.StartDate,
+                        EndDate = j.Job.EndDate,
+                        AssigmentDate = j.AssignmentDate,
+                        Status = j.Job.JobStatus.Name,
+                    }).ToList();
+                    dgEmployeeJobs.ItemsSource = job.ToList();
+                    cbAllJob.IsChecked = false;
+                    if (job.Any())
+                    {
+                        dgEmployeeJobs.ItemsSource = job.ToList();
+                        cbAllJob.IsChecked = false;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Không tìm thấy công việc có tên: " + txtDatasearch.Text, "Thông báo");
+                        return;
+                    }
+                }
+                else if (cbbFilter.SelectedIndex == 2)
+                {
+                    var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && (j.Job.AssignedByNavigation.FirstName + " " + j.Job.AssignedByNavigation.LastName).ToLower().Contains(txtDatasearch.Text.ToLower()) && j.EmployeeId == em.Id).Select(j => new
+                    {
+                        ID = j.EmployeeJobId,
+                        JobID = j.JobId,
+                        JobName = j.Job.Title,
+                        Description = j.Job.Description,
+                        EmployeeName = j.Employee.FirstName + " " + j.Employee.LastName,
+                        AssignBy = j.Job.AssignedByNavigation.FirstName + " " + j.Job.AssignedByNavigation.LastName,
+                        StartDate = j.Job.StartDate,
+                        EndDate = j.Job.EndDate,
+                        AssigmentDate = j.AssignmentDate,
+                        Status = j.Job.JobStatus.Name,
+                    }).ToList();
+                    dgEmployeeJobs.ItemsSource = job.ToList();
+                    cbAllJob.IsChecked = false;
+                    if (job.Any())
+                    {
+                        dgEmployeeJobs.ItemsSource = job.ToList();
+                        cbAllJob.IsChecked = false;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Không tìm thấy người giao việc tên: " + txtDatasearch.Text, "Thông báo");
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                if (cbbFilter.SelectedIndex == 0)
+                {
+                    var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && (j.Employee.FirstName + " " + j.Employee.LastName).ToLower().Contains(txtDatasearch.Text.ToLower())).Select(j => new
+                    {
+                        ID = j.EmployeeJobId,
+                        JobID = j.JobId,
+                        JobName = j.Job.Title,
+                        Description = j.Job.Description,
+                        EmployeeName = j.Employee.FirstName + " " + j.Employee.LastName,
+                        AssignBy = j.Job.AssignedByNavigation.FirstName + " " + j.Job.AssignedByNavigation.LastName,
+                        StartDate = j.Job.StartDate,
+                        EndDate = j.Job.EndDate,
+                        AssigmentDate = j.AssignmentDate,
+                        Status = j.Job.JobStatus.Name,
+                    }).ToList();
+                    if (job.Any())
+                    {
+                        dgEmployeeJobs.ItemsSource = job.ToList();
+                        cbAllJob.IsChecked = false;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Không tìm thấy nhân viên có tên : " + txtDatasearch.Text, "Thông báo");
+                        return;
+                    }
+                }
+                else if (cbbFilter.SelectedIndex == 1)
+                {
+                    var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && j.Job.Title.ToLower().Contains(txtDatasearch.Text)).Select(j => new
+                    {
+                        ID = j.EmployeeJobId,
+                        JobID = j.JobId,
+                        JobName = j.Job.Title,
+                        Description = j.Job.Description,
+                        EmployeeName = j.Employee.FirstName + " " + j.Employee.LastName,
+                        AssignBy = j.Job.AssignedByNavigation.FirstName + " " + j.Job.AssignedByNavigation.LastName,
+                        StartDate = j.Job.StartDate,
+                        EndDate = j.Job.EndDate,
+                        AssigmentDate = j.AssignmentDate,
+                        Status = j.Job.JobStatus.Name,
+                    }).ToList();
+                    dgEmployeeJobs.ItemsSource = job.ToList();
+                    cbAllJob.IsChecked = false;
+                    if (job.Any())
+                    {
+                        dgEmployeeJobs.ItemsSource = job.ToList();
+                        cbAllJob.IsChecked = false;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Không tìm thấy công việc có tên: " + txtDatasearch.Text, "Thông báo");
+                        return;
+                    }
+                }
+                else if (cbbFilter.SelectedIndex == 2)
+                {
+                    var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && (j.Job.AssignedByNavigation.FirstName + " " + j.Job.AssignedByNavigation.LastName).ToLower().Contains(txtDatasearch.Text.ToLower())).Select(j => new
+                    {
+                        ID = j.EmployeeJobId,
+                        JobID = j.JobId,
+                        JobName = j.Job.Title,
+                        Description = j.Job.Description,
+                        EmployeeName = j.Employee.FirstName + " " + j.Employee.LastName,
+                        AssignBy = j.Job.AssignedByNavigation.FirstName + " " + j.Job.AssignedByNavigation.LastName,
+                        StartDate = j.Job.StartDate,
+                        EndDate = j.Job.EndDate,
+                        AssigmentDate = j.AssignmentDate,
+                        Status = j.Job.JobStatus.Name,
+                    }).ToList();
+                    dgEmployeeJobs.ItemsSource = job.ToList();
+                    cbAllJob.IsChecked = false;
+                    if (job.Any())
+                    {
+                        dgEmployeeJobs.ItemsSource = job.ToList();
+                        cbAllJob.IsChecked = false;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Không tìm thấy người giao việc tên: " + txtDatasearch.Text, "Thông báo");
+                        return;
+                    }
+                }
+            }
         }
     }
 }

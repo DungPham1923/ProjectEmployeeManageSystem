@@ -45,14 +45,14 @@
         <DataGrid Name="dgEmployeeJobs" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Grid.RowSpan="6" FontSize="15">
         </DataGrid>
         <StackPanel Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="4" Orientation="Horizontal" Margin="110,0,0,0">
-            <Label Margin="10,5,10,5" FontSize="15">Tìm kiếm theo:</Label>
-            <ComboBox Name="cbbFilter" Width="150" Height="30" Margin="10,5,10,5" FontSize="15">
+            <Label Margin="10,5,10,5" FontSize="15">Tìm kiếm:</Label>
+            <TextBox Name="txtDatasearch" Width="200" Height="30" FontSize="15" TextChanged="txtDatasearch_TextChanged"/>
+            <ComboBox Name="cbbFilter" Width="150" Height="30" Margin="10,5,10,5" FontSize="15" SelectionChanged="cbbFilter_SelectionChanged" >
                 <ComboBoxItem Content="Tên nhân viên" Visibility="Collapsed" Name="cbbItemSearch"/>
                 <ComboBoxItem Content="Tên công việc"/>
                 <ComboBoxItem Content="Người giao việc"/>
             </ComboBox>
-            <TextBox Name="txtDatasearch" Width="200" Height="30" FontSize="15" />
-            <Button Content="Tìm" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0" Click="Search_Click"/>
+            <!--<Button Content="Tìm" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0" Click="Search_Click"/>-->
             <Label Margin="10,5,10,5" FontSize="15">Trạng thái công việc:</Label>
             <ComboBox Name="cbbFilterJobStatus" Width="150" Height="30" Margin="10,5,10,5" FontSize="15" SelectionChanged="cbbFilterJobStatus_SelectionChanged" ></ComboBox>
 

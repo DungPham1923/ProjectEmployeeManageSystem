@@ -276,12 +276,6 @@ namespace ManageEmployeeSystem
         private void cbbFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int idFilter = cbbFilter.SelectedIndex;
-            if(idFilter == -1)
-            {
-                MessageBox.Show("Vui lòng lựa chọn loại tìm kiếm!", "Thông báo");
-                return;
-            }
-
             string dataSearch = txtDatasearch.Text;
             if(dataSearch == null)
             {
@@ -377,10 +371,6 @@ namespace ManageEmployeeSystem
             }
         }
 
-        private void txtDatasearch_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            cbbFilter.SelectedIndex = -1;
-        }
 
         private void GoBack_Click(object sender, RoutedEventArgs e)
         {
@@ -388,6 +378,11 @@ namespace ManageEmployeeSystem
             this.Hide();
             home.ShowDialog();
             this.Close();
+        }
+
+        private void txtDatasearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            cbbFilter.SelectedIndex = -1;
         }
     }
 }
