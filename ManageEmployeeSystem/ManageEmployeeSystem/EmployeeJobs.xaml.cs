@@ -725,5 +725,13 @@ namespace ManageEmployeeSystem
                 }
             }
         }
+
+        private void GoBack_Click(object sender, RoutedEventArgs e)
+        {
+            Home home = new Home(em);
+            this.Hide();
+            home.ShowDialog();
+            this.Close();
+        }
     }
 }

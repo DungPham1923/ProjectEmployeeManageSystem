@@ -120,6 +120,10 @@ namespace ManageEmployeeSystem
                 cbbDepartment.SelectedValuePath = "ID";
 
                 var positions = database.Positions.ToList();
+                //if (positions.Count == 0)
+                //{
+                //    positions = database.Positions.ToList();
+                //}
                 cbbPosition.ItemsSource = positions;
                 cbbPosition.DisplayMemberPath = "Name";
                 cbbPosition.SelectedValuePath = "ID";
@@ -135,7 +139,7 @@ namespace ManageEmployeeSystem
             }
             else //load objects current
             {
-                if (em != null)
+                if (employee != null)
                 {
                     var departments = database.Departments.Where(d => d.Id == employee.DepartmentId).ToList();
                     cbbDepartment.ItemsSource = departments;
@@ -143,6 +147,10 @@ namespace ManageEmployeeSystem
                     cbbDepartment.SelectedValuePath = "ID";
 
                     var positions = database.Positions.Where(p => p.Id == employee.PositionId).ToList();
+                    //if (positions.Count == 0)
+                    //{
+                    //    positions = database.Positions.ToList();
+                    //}
                     cbbPosition.ItemsSource = positions;
                     cbbPosition.DisplayMemberPath = "Name";
                     cbbPosition.SelectedValuePath = "ID";
@@ -256,7 +264,7 @@ namespace ManageEmployeeSystem
 
                 //var manager = database.Employees.FirstOrDefault(m => m.Id == employee.Id);
 
-                
+
                 bool gender = employee.Gender.HasValue && employee.Gender.Value;
                 if (gender == false)
                 {
@@ -379,10 +387,10 @@ namespace ManageEmployeeSystem
                     int idDepartment = selectedDepartment.Id;
 
                     var selectedPosition = cbbPosition.SelectedItem as Position;
-                    if(selectedPosition == null)
+                    if (selectedPosition == null)
                     {
                         MessageBox.Show("Vui lòng lựa chọn vị trí công việc!", "Thông báo");
-                        return ;
+                        return;
                     }
                     int idPosition = selectedPosition.Id;
 
@@ -401,7 +409,7 @@ namespace ManageEmployeeSystem
                             {
                                 changeManagerEmployee = database.Employees.Where(e => e.DepartmentId == idDepartment).ToList();
                             }
-                            
+
                             if (changeManager != null)
                             {
                                 changeManager.PositionId = null;
@@ -836,6 +844,27 @@ namespace ManageEmployeeSystem
             catch (Exception ex)
             {
                 MessageBox.Show("Lỗi xóa nhân viên không thành công!", "Thông báo");
+            }
+        }
+
+        private void GoBack_Click(object sender, RoutedEventArgs e)
+        {
+            if (employeeAdmin != null)
+            {
+                ManageEmployee manageEmployee = new ManageEmployee(employeeAdmin);
+                this.Hide();
+                manageEmployee.ShowDialog();
+                this.Close();
+            }
+            else
+            {
+                if (em != null)
+                {
+                    Home home = new Home(em);
+                    this.Hide();
+                    home.ShowDialog();
+                    this.Close();
+                }
             }
         }
     }

@@ -381,5 +381,13 @@ namespace ManageEmployeeSystem
         {
             cbbFilter.SelectedIndex = -1;
         }
+
+        private void GoBack_Click(object sender, RoutedEventArgs e)
+        {
+            Home home = new Home(em);
+            this.Hide();
+            home.ShowDialog();
+            this.Close();
+        }
     }
 }
