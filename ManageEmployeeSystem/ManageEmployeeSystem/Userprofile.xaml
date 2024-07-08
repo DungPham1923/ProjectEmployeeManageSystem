@@ -38,10 +38,10 @@
         <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" FontSize="20" FontWeight="DemiBold">Thông tin cá nhân:</Label>
         
         <StackPanel Visibility="Collapsed" Name="addFromFile" Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="5,0,5,0">
-            <Label Grid.ColumnSpan="5" HorizontalAlignment="Center" FontSize="20" FontWeight="DemiBold" Margin="5,0,5,0">File: </Label>
+            <Label Grid.ColumnSpan="5" HorizontalAlignment="Center" FontSize="20" Margin="5,0,5,0">File: </Label>
             <TextBox FontSize="15" Height="30" Name="txtFilepath" Width="450" Margin="5,0,5,0"/>
+            <Button Content="Tải" Width="50" Height="30" FontSize="15" FontWeight="DemiBold" Margin="5,0,5,0"/>
             <Button Content="Tệp" Width="50" Height="30" FontSize="15" FontWeight="DemiBold" Margin="5,0,5,0" Click="OpenFile_Click" />
-            <Button Content="Thêm hàng loạt" Width="150" Height="30" FontSize="15" FontWeight="DemiBold" Margin="5,0,5,0"/>
         </StackPanel>
         
 
@@ -121,8 +121,9 @@
             <Button Content="Trang chủ" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0" Click="GoHome_Click"/>
             <Button Content="Đăng xuất" Width="100" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0" Click="Logout_Click" />
         </StackPanel>
-        <!--<Label Grid.Row="10" Grid.Column="2" Grid.ColumnSpan="2" FontSize="20" FontWeight="DemiBold" Name="lbDepartment" Visibility="Collapsed">Danh sách phòng ban:</Label>
-        <DataGrid Grid.Row="11" Grid.Column="2" Grid.ColumnSpan="2" Grid.RowSpan="4" Width="680" Visibility="Collapsed" FontSize="15" Margin="0,0,20,0" Name="dgDepartments" SelectionChanged="dgDepartments_SelectionChanged">
-        </DataGrid>-->
+        <DataGrid Name="dgEmployee" Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="4" Grid.RowSpan="4" FontSize="15" Visibility="Collapsed">
+        </DataGrid>
+        <Button Name="btnAddmany" Grid.Column="3" Visibility="Collapsed" Grid.Row="15" Content="Thêm tất cả" Width="150" Height="30" FontSize="15" FontWeight="DemiBold" Margin="15,0,0,0" Click="btnAddmany_Click" />
+
     </Grid>
 </Window>

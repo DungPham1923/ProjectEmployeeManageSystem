@@ -36,6 +36,7 @@ namespace ManageEmployeeSystem
         Employee em;
         Employee employeeAdmin;
         ProjectPrn212Context database = new ProjectPrn212Context();
+        List<Employee> getListFromExcel = new List<Employee>();
         public Userprofile(Employee employee)
         {
             InitializeComponent();
@@ -670,6 +671,13 @@ namespace ManageEmployeeSystem
         {
             ClearForm();
         }
+        private static bool IsEmailFormatValid(string email)
+        {
+            // Biểu thức chính quy kiểm tra định dạng email phổ biến
+            string pattern = @"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$";
+            Regex regex = new Regex(pattern);
+            return regex.IsMatch(email);
+        }
         private void btnAddEmployee_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -703,6 +711,21 @@ namespace ManageEmployeeSystem
                 if (!double.TryParse(txtSalary.Text, out double salary))
                 {
                     MessageBox.Show("Vui lòng nhập lương của nhân viên!", "Thông báo");
+                    return;
+                }
+                if (!IsEmailFormatValid(email))
+                {
+                    MessageBox.Show("Email không hợp lệ!", "Thông báo");
+                    return;
+                }
+                if (CheckDuplicateEmail(email))
+                {
+                    MessageBox.Show("Email đã tồn tại!", "Thông báo");
+                    return;
+                }
+                if (!IsValidPhoneNumber(phone))
+                {
+                    MessageBox.Show("Số điện thoại không hợp lệ!", "Thông báo");
                     return;
                 }
                 var selectedDepartment = cbbDepartment.SelectedItem as Department;
@@ -931,46 +954,49 @@ namespace ManageEmployeeSystem
             {
                 string filename = openFileDialog.FileName;
                 ///ImportEmployeesFromJson(filename);
-                List<Employee> getListFromExcel = ReadExcelData(filename);
-                getListFromExcel.ForEach(e => database.Employees.Add(e));
-                if (database.SaveChanges() > 0)
+                getListFromExcel = ReadExcelData(filename);
+
+                dgEmployee.ItemsSource = getListFromExcel.Select(e => new
                 {
-                    MessageBox.Show("Thành công!");
-                }
+                    FirstName = e.FirstName,
+                    LastName = e.LastName,
+                    Email = e.Email,
+                    Phone = e.Phone,
+                    DateOfBirth = e.DateOfBirth,
+                    Gender = (bool)e.Gender ? "Nam" : "Nữ",
+                    Address = e.Address,
+                    Salary = e.Salary,
+                    Department = e.DepartmentId,
+                    Manager = e.ManagerId,
+                    Position = e.PositionId,
+                });
+                dgEmployee.Visibility = Visibility.Visible;
+                btnAddmany.Visibility = Visibility.Visible;
             }
         }
+        private bool CheckDuplicateEmail(string email)
+        {
+            var employee = database.Employees.Where(e => e.Email.Equals(email));
+            if (employee.Any())
+            {
+                return false;
+            }
+            return true;
+        }
 
+        private bool IsValidPhoneNumber(string phoneNumber)
+        {
+            if (string.IsNullOrEmpty(phoneNumber))
+            {
+                return false;
+            }
 
-        //public void readData()
-        //{
+            string pattern = @"^0\d{9}$";
+            Regex regex = new Regex(pattern);
 
-        //    string FilePath = @"C:\excelsheet.xlsx";
+            return regex.IsMatch(phoneNumber);
+        }
 
-        //    FileInfo existingFile = new FileInfo(FilePath);
-
-        //    using (ExcelPackage package = new ExcelPackage(existingFile))
-        //    {
-
-        //        //if there are more than one worksheet
-        //        for (int x = 1; x <= package.Workbook.Worksheets.Count; x++)
-        //        {
-        //            ExcelWorksheet worksheet = package.Workbook.Worksheets[x];
-        //            int rowCount = worksheet.Dimension.End.Row;     //get row count
-
-        //            for (int Row = 2; Row <= rowCount; Row++)
-        //            {
-        //                ExcelToDatabase.Columns Temp = new ExcelToDatabase.Columns();
-
-        //                Temp.Column1 = worksheet.Cells[Row, 2].Value.ToString();
-        //                Temp.Column2 = worksheet.Cells[Row, 3].Value;
-        //                Temp.Column3 = worksheet.Cells[Row, 4].Value;
-
-        //            }
-        //            ColumnList.Add(Temp);
-
-        //        }
-        //    }
-        //}
         public List<Employee> ReadExcelData(string filePath)
         {
             List<Employee> employeeList = new List<Employee>();
@@ -984,41 +1010,36 @@ namespace ManageEmployeeSystem
                 for (int row = 2; row <= rowCount; row++) // Bắt đầu từ hàng 2 (hàng đầu tiên là header)
                 {
                     Employee employee = new Employee();
-                    employee.FirstName = worksheet.Cells[row, 1].Value?.ToString() != null ? worksheet.Cells[row, 1].Value?.ToString() : null; // Cột A
-                    employee.LastName = worksheet.Cells[row, 2].Value?.ToString() != null ? worksheet.Cells[row, 2].Value?.ToString() : null;  // Cột B
-                    employee.Email = worksheet.Cells[row, 3].Value?.ToString() != null ? worksheet.Cells[row, 3].Value?.ToString() : null;     // Cột C
-                    employee.Phone = worksheet.Cells[row, 4].Value?.ToString() != null ? worksheet.Cells[row, 4].Value?.ToString() : null;     // Cột D
+                    employee.FirstName = worksheet.Cells[row, 1].Value?.ToString() != null ? worksheet.Cells[row, 1].Value?.ToString() : null;
+                    employee.LastName = worksheet.Cells[row, 2].Value?.ToString() != null ? worksheet.Cells[row, 2].Value?.ToString() : null;
+                    string email = worksheet.Cells[row, 3].Value?.ToString() != null ? worksheet.Cells[row, 3].Value?.ToString() : null;
+                    if (!IsEmailFormatValid(email))
+                    {
+                        continue;
+                    }
+                    employee.Email = worksheet.Cells[row, 3].Value?.ToString() != null ? worksheet.Cells[row, 3].Value?.ToString() : null;
+                    string phone = worksheet.Cells[row, 4].Value?.ToString() != null ? worksheet.Cells[row, 4].Value?.ToString() : null;
+                    if (!IsValidPhoneNumber(phone))
+                    {
+                        continue;
+                    }
+                    employee.Phone = worksheet.Cells[row, 4].Value?.ToString() != null ? worksheet.Cells[row, 4].Value?.ToString() : null;
                     employee.Salary = worksheet.Cells[row, 5].Value?.ToString() != null ? Decimal.Parse(worksheet.Cells[row, 5].Value?.ToString()) : null;
                     employee.RoleId = worksheet.Cells[row, 6].Value?.ToString() != null ? int.Parse(worksheet.Cells[row, 6].Value?.ToString()) : null;
                     employee.DepartmentId = worksheet.Cells[row, 7].Value?.ToString() != null ? int.Parse(worksheet.Cells[row, 7].Value?.ToString()) : null;
                     employee.ManagerId = worksheet.Cells[row, 8].Value?.ToString() != null ? int.Parse(worksheet.Cells[row, 8].Value?.ToString()) : null;
-                    employee.PositionId = worksheet.Cells[row, 9].Value?.ToString() != null ? int.Parse(worksheet.Cells[row, 9].Value?.ToString()) : null;
-                    //employee.DateOfBirth = worksheet.Cells[row, 10].Value?.ToString() != null ? DateOnly.Parse(worksheet.Cells[row, 10].Value?.ToString()) : null;
-                    //string dateString = worksheet.Cells[row, 10].Value?.ToString();
-                    //&& DateTime.TryParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate)  
+                    employee.PositionId = worksheet.Cells[row, 9].Value?.ToString() != null ? int.Parse(worksheet.Cells[row, 9].Value?.ToString()) : null; 
                     string dateString = worksheet.Cells[row, 10].Value?.ToString();
                     double excelDateNumber = double.Parse(dateString);
                     DateTime date = DateTime.FromOADate(excelDateNumber);
-                    MessageBox.Show(dateString);
                     if (!string.IsNullOrEmpty(dateString))
                     {
                         employee.DateOfBirth = DateOnly.FromDateTime(date.Date);
-                        if (DateTime.TryParse(dateString, out DateTime parsedDate))
-                        {
-                             // Lưu ý chỉ lấy phần ngày (không có thời gian)
-                        }
-                        else
-                        {
-                            // Xử lý khi không thể phân tích cú pháp ngày
-                            // Ví dụ: Gán giá trị mặc định hoặc thông báo lỗi
-                        }
                     }
                     else
                     {
-                        employee.DateOfBirth = null; // hoặc xử lý khác tùy vào logic ứng dụng của bạn
+                        employee.DateOfBirth = null;
                     }
-
-                    // employee.Gender = worksheet.Cells[row, 11].Value?.ToString() != null ? bool.Parse(worksheet.Cells[row, 11].Value?.ToString()) : null;
                     string genderString = worksheet.Cells[row, 11].Value?.ToString();
                     if (!string.IsNullOrEmpty(genderString))
                     {
@@ -1039,10 +1060,9 @@ namespace ManageEmployeeSystem
                     {
                         employee.Gender = null;
                     }
-
                     employee.Address = worksheet.Cells[row, 12].Value?.ToString() != null ? worksheet.Cells[row, 12].Value?.ToString() : null;
-                    employee.CreatedAt = DateOnly.FromDateTime(DateTime.Now);
-                    employee.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
+                    //employee.CreatedAt = DateOnly.FromDateTime(DateTime.Now);
+                    //employee.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
                     employeeList.Add(employee);
                 }
             }
@@ -1050,5 +1070,76 @@ namespace ManageEmployeeSystem
             return employeeList;
         }
 
+        private void btnAddmany_Click(object sender, RoutedEventArgs e)
+        {
+            int countAdd = 0;
+            int countError = 0;
+            List<Employee> addError = new List<Employee>();
+            try
+            {
+                if (MessageBox.Show("Xác nhận thêm tất cả nhân viên mới?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    foreach (var employee in getListFromExcel)
+                    {
+                        if (!CheckDuplicateEmail(employee.Email))
+                        {
+                            countError++;
+                            addError.Add(employee);
+                            continue;
+                        }
+                        employee.CreatedAt = DateOnly.FromDateTime(DateTime.Now);
+                        employee.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
+                        database.Employees.Add(employee);
+                        database.SaveChanges();
+                        Authentication auth = new Authentication();
+                        auth.EmployeeId = employee.Id;
+                        auth.Username = employee.Email;
+                        auth.PassWord = "12345678";
+                        auth.CreatedAt = DateOnly.FromDateTime(DateTime.Now);
+                        auth.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
+                        database.Authentications.Add(auth);
+                        if (database.SaveChanges() > 0)
+                        {
+                            countAdd++;
+                        }
+                    }
+                    if (countAdd == getListFromExcel.Count)
+                    {
+                        MessageBox.Show("Thêm tất cả nhân viên thành công!", "Thông báo");
+                        return;
+                    }
+                    else
+                    {
+                        if(MessageBox.Show("Thêm thành công " + countAdd + " nhân viên, Lỗi: " + countError + ", Xem danh sách lỗi?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        {
+                            dgEmployee.ItemsSource = addError.Select(e => new
+                            {
+                                FirstName = e.FirstName,
+                                LastName = e.LastName,
+                                Email = e.Email,
+                                Phone = e.Phone,
+                                DateOfBirth = e.DateOfBirth,
+                                Gender = (bool)e.Gender ? "Nam" : "Nữ",
+                                Address = e.Address,
+                                Salary = e.Salary,
+                                Department = e.DepartmentId,
+                                Manager = e.ManagerId,
+                                Position = e.PositionId,
+                            });
+                            btnAddmany.Visibility = Visibility.Collapsed;
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message, "Thông báo");
+            }
+
+        }
     }
 }
