@@ -47,7 +47,7 @@ namespace ManageEmployeeSystem
                 Description = d.Description,
                 CreatedAt = d.CreatedAt,
                 UpdatedAt = d.UpdatedAt,
-                Status = d.IsDelete,
+                Status = (bool) d.IsDelete ? "Ngừng hoạt động" : "Đang hoạt động",
             }).ToList();
             //var departmentData = database.Employees.Where(e => e.RoleId == 3).Include(d => d.Department).Select(d => new
             //{
@@ -144,7 +144,7 @@ namespace ManageEmployeeSystem
             var department = dgDepartment.SelectedItem as dynamic;
             if (department != null)
             {
-                if (department.Status == false)
+                if (department.Status == "Đang hoạt động")
                 {
                     radioActive.IsChecked = true;
                 }

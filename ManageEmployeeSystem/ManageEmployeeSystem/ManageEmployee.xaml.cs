@@ -46,7 +46,7 @@ namespace ManageEmployeeSystem
                 Email = e.Email,
                 Phone = e.Phone,
                 DateOfBirth = e.DateOfBirth,
-                Gender = e.Gender,
+                Gender = (bool) e.Gender ? "Nam": "Nữ",
                 Address = e.Address,
                 Salary = e.Salary,
                 Department = e.Department.Name,
@@ -70,7 +70,7 @@ namespace ManageEmployeeSystem
                     Email = e.Email,
                     Phone = e.Phone,
                     DateOfBirth = e.DateOfBirth,
-                    Gender = e.Gender,
+                    Gender = (bool)e.Gender ? "Nam" : "Nữ",
                     Address = e.Address,
                     Salary = e.Salary,
                     Department = e.Department.Name,
@@ -99,7 +99,7 @@ namespace ManageEmployeeSystem
                     Email = e.Email,
                     Phone = e.Phone,
                     DateOfBirth = e.DateOfBirth,
-                    Gender = e.Gender,
+                    Gender = (bool)e.Gender ? "Nam" : "Nữ",
                     Address = e.Address,
                     Salary = e.Salary,
                     Department = e.Department.Name,
@@ -113,7 +113,7 @@ namespace ManageEmployeeSystem
                 }
                 else
                 {
-                    MessageBox.Show("Không tìm thấy nhân viên nào đã bị xóa!", "Thông báo");
+                    MessageBox.Show("Không tìm thấy nhân viên nào đã ngừng hoạt động!", "Thông báo");
                     return;
                 }
             }
@@ -128,7 +128,7 @@ namespace ManageEmployeeSystem
                     Email = e.Email,
                     Phone = e.Phone,
                     DateOfBirth = e.DateOfBirth,
-                    Gender = e.Gender,
+                    Gender = (bool)e.Gender ? "Nam" : "Nữ",
                     Address = e.Address,
                     Salary = e.Salary,
                     Department = e.Department.Name,
@@ -158,7 +158,7 @@ namespace ManageEmployeeSystem
                     Email = e.Email,
                     Phone = e.Phone,
                     DateOfBirth = e.DateOfBirth,
-                    Gender = e.Gender,
+                    Gender = (bool)e.Gender ? "Nam" : "Nữ",
                     Address = e.Address,
                     Salary = e.Salary,
                     Department = e.Department.Name,
@@ -205,7 +205,7 @@ namespace ManageEmployeeSystem
                 Email = e.Email,
                 Phone = e.Phone,
                 DateOfBirth = e.DateOfBirth,
-                Gender = e.Gender,
+                Gender = (bool)e.Gender ? "Nam" : "Nữ",
                 Address = e.Address,
                 Salary = e.Salary,
                 Department = e.Department.Name,
@@ -293,7 +293,7 @@ namespace ManageEmployeeSystem
                     Email = e.Email,
                     Phone = e.Phone,
                     DateOfBirth = e.DateOfBirth,
-                    Gender = e.Gender,
+                    Gender = (bool)e.Gender ? "Nam" : "Nữ",
                     Address = e.Address,
                     Salary = e.Salary,
                     Department = e.Department.Name,
@@ -322,7 +322,7 @@ namespace ManageEmployeeSystem
                     Email = e.Email,
                     Phone = e.Phone,
                     DateOfBirth = e.DateOfBirth,
-                    Gender = e.Gender,
+                    Gender = (bool)e.Gender ? "Nam" : "Nữ",
                     Address = e.Address,
                     Salary = e.Salary,
                     Department = e.Department.Name,
@@ -351,7 +351,7 @@ namespace ManageEmployeeSystem
                     Email = e.Email,
                     Phone = e.Phone,
                     DateOfBirth = e.DateOfBirth,
-                    Gender = e.Gender,
+                    Gender = (bool)e.Gender ? "Nam" : "Nữ",
                     Address = e.Address,
                     Salary = e.Salary,
                     Department = e.Department.Name,

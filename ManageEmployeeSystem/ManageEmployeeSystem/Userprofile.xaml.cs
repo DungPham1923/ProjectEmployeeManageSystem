@@ -1,10 +1,13 @@
 ﻿using ManageEmployeeSystem.Models;
 using Microsoft.IdentityModel.Tokens;
+using OfficeOpenXml;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
@@ -555,7 +558,7 @@ namespace ManageEmployeeSystem
             string password = txtOldpassword.Password;
             string newpassword = txtNewpassword.Password;
             string repassword = txtRepassword.Password;
-            if(employeeAdmin == null)
+            if (employeeAdmin == null)
             {
                 if (password.IsNullOrEmpty()) { MessageBox.Show("Vui lòng điền mật khẩu!", "Thông báo"); return; }
             }
@@ -883,13 +886,13 @@ namespace ManageEmployeeSystem
         private void Resetpassword_Click(object sender, RoutedEventArgs e)
         {
             var authentication = database.Authentications.SingleOrDefault(a => a.EmployeeId == em.Id);
-            if(authentication != null)
+            if (authentication != null)
             {
                 authentication.PassWord = "12345678";
                 database.Authentications.Update(authentication);
-                if(database.SaveChanges() > 0)
+                if (database.SaveChanges() > 0)
                 {
-                    MessageBox.Show("Reset mật khẩu cho nhân viên \"" + em.FirstName + " " + em.LastName + "\" thành công!","Thông báo" );
+                    MessageBox.Show("Reset mật khẩu cho nhân viên \"" + em.FirstName + " " + em.LastName + "\" thành công!", "Thông báo");
                 }
                 else
                 {
@@ -904,15 +907,15 @@ namespace ManageEmployeeSystem
         bool display = true;
         private void btnAddFromfile_Click(object sender, RoutedEventArgs e)
         {
-            if (!display)
+            if (display)
             {
                 addFromFile.Visibility = Visibility.Visible;
-                display = true;
+                display = false;
             }
             else
             {
                 addFromFile.Visibility = Visibility.Collapsed;
-                display = false;
+                display = true;
             }
         }
 
@@ -928,7 +931,124 @@ namespace ManageEmployeeSystem
             {
                 string filename = openFileDialog.FileName;
                 ///ImportEmployeesFromJson(filename);
+                List<Employee> getListFromExcel = ReadExcelData(filename);
+                getListFromExcel.ForEach(e => database.Employees.Add(e));
+                if (database.SaveChanges() > 0)
+                {
+                    MessageBox.Show("Thành công!");
+                }
             }
         }
+
+
+        //public void readData()
+        //{
+
+        //    string FilePath = @"C:\excelsheet.xlsx";
+
+        //    FileInfo existingFile = new FileInfo(FilePath);
+
+        //    using (ExcelPackage package = new ExcelPackage(existingFile))
+        //    {
+
+        //        //if there are more than one worksheet
+        //        for (int x = 1; x <= package.Workbook.Worksheets.Count; x++)
+        //        {
+        //            ExcelWorksheet worksheet = package.Workbook.Worksheets[x];
+        //            int rowCount = worksheet.Dimension.End.Row;     //get row count
+
+        //            for (int Row = 2; Row <= rowCount; Row++)
+        //            {
+        //                ExcelToDatabase.Columns Temp = new ExcelToDatabase.Columns();
+
+        //                Temp.Column1 = worksheet.Cells[Row, 2].Value.ToString();
+        //                Temp.Column2 = worksheet.Cells[Row, 3].Value;
+        //                Temp.Column3 = worksheet.Cells[Row, 4].Value;
+
+        //            }
+        //            ColumnList.Add(Temp);
+
+        //        }
+        //    }
+        //}
+        public List<Employee> ReadExcelData(string filePath)
+        {
+            List<Employee> employeeList = new List<Employee>();
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            using (var package = new ExcelPackage(new FileInfo(filePath)))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // Lấy worksheet đầu tiên (index 0)
+
+                int rowCount = worksheet.Dimension.Rows;
+                int columnCount = worksheet.Dimension.Columns;
+                for (int row = 2; row <= rowCount; row++) // Bắt đầu từ hàng 2 (hàng đầu tiên là header)
+                {
+                    Employee employee = new Employee();
+                    employee.FirstName = worksheet.Cells[row, 1].Value?.ToString() != null ? worksheet.Cells[row, 1].Value?.ToString() : null; // Cột A
+                    employee.LastName = worksheet.Cells[row, 2].Value?.ToString() != null ? worksheet.Cells[row, 2].Value?.ToString() : null;  // Cột B
+                    employee.Email = worksheet.Cells[row, 3].Value?.ToString() != null ? worksheet.Cells[row, 3].Value?.ToString() : null;     // Cột C
+                    employee.Phone = worksheet.Cells[row, 4].Value?.ToString() != null ? worksheet.Cells[row, 4].Value?.ToString() : null;     // Cột D
+                    employee.Salary = worksheet.Cells[row, 5].Value?.ToString() != null ? Decimal.Parse(worksheet.Cells[row, 5].Value?.ToString()) : null;
+                    employee.RoleId = worksheet.Cells[row, 6].Value?.ToString() != null ? int.Parse(worksheet.Cells[row, 6].Value?.ToString()) : null;
+                    employee.DepartmentId = worksheet.Cells[row, 7].Value?.ToString() != null ? int.Parse(worksheet.Cells[row, 7].Value?.ToString()) : null;
+                    employee.ManagerId = worksheet.Cells[row, 8].Value?.ToString() != null ? int.Parse(worksheet.Cells[row, 8].Value?.ToString()) : null;
+                    employee.PositionId = worksheet.Cells[row, 9].Value?.ToString() != null ? int.Parse(worksheet.Cells[row, 9].Value?.ToString()) : null;
+                    //employee.DateOfBirth = worksheet.Cells[row, 10].Value?.ToString() != null ? DateOnly.Parse(worksheet.Cells[row, 10].Value?.ToString()) : null;
+                    //string dateString = worksheet.Cells[row, 10].Value?.ToString();
+                    //&& DateTime.TryParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate)  
+                    string dateString = worksheet.Cells[row, 10].Value?.ToString();
+                    double excelDateNumber = double.Parse(dateString);
+                    DateTime date = DateTime.FromOADate(excelDateNumber);
+                    MessageBox.Show(dateString);
+                    if (!string.IsNullOrEmpty(dateString))
+                    {
+                        employee.DateOfBirth = DateOnly.FromDateTime(date.Date);
+                        if (DateTime.TryParse(dateString, out DateTime parsedDate))
+                        {
+                             // Lưu ý chỉ lấy phần ngày (không có thời gian)
+                        }
+                        else
+                        {
+                            // Xử lý khi không thể phân tích cú pháp ngày
+                            // Ví dụ: Gán giá trị mặc định hoặc thông báo lỗi
+                        }
+                    }
+                    else
+                    {
+                        employee.DateOfBirth = null; // hoặc xử lý khác tùy vào logic ứng dụng của bạn
+                    }
+
+                    // employee.Gender = worksheet.Cells[row, 11].Value?.ToString() != null ? bool.Parse(worksheet.Cells[row, 11].Value?.ToString()) : null;
+                    string genderString = worksheet.Cells[row, 11].Value?.ToString();
+                    if (!string.IsNullOrEmpty(genderString))
+                    {
+                        if (genderString.Equals("Nam", StringComparison.OrdinalIgnoreCase))
+                        {
+                            employee.Gender = true;
+                        }
+                        else if (genderString.Equals("Nữ", StringComparison.OrdinalIgnoreCase))
+                        {
+                            employee.Gender = false;
+                        }
+                        else
+                        {
+                            employee.Gender = null;
+                        }
+                    }
+                    else
+                    {
+                        employee.Gender = null;
+                    }
+
+                    employee.Address = worksheet.Cells[row, 12].Value?.ToString() != null ? worksheet.Cells[row, 12].Value?.ToString() : null;
+                    employee.CreatedAt = DateOnly.FromDateTime(DateTime.Now);
+                    employee.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
+                    employeeList.Add(employee);
+                }
+            }
+
+            return employeeList;
+        }
+
     }
 }
