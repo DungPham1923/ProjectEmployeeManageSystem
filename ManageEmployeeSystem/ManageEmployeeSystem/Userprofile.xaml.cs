@@ -944,6 +944,7 @@ namespace ManageEmployeeSystem
 
         private void OpenFile_Click(object sender, RoutedEventArgs e)
         {
+            txtFilepath.Clear();
             Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
             openFileDialog.Filter = "Excel Files (*.xls;*.xlsx)|*.xls;*.xlsx|All files (*.*)|*.*";
             openFileDialog.Title = "Chọn tệp Excel";
@@ -1110,7 +1111,7 @@ namespace ManageEmployeeSystem
                     }
                     else
                     {
-                        if(MessageBox.Show("Thêm thành công " + countAdd + " nhân viên, Lỗi: " + countError + ", Xem danh sách lỗi?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        if(MessageBox.Show("Thêm thành công " + countAdd + " nhân viên, Lỗi: " + countError + "  do trùng Email, Xem danh sách lỗi?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                         {
                             dgEmployee.ItemsSource = addError.Select(e => new
                             {
@@ -1140,6 +1141,101 @@ namespace ManageEmployeeSystem
                 MessageBox.Show("Lỗi: " + ex.Message, "Thông báo");
             }
 
+        }
+
+        private void btnAddmanyFilePath_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                
+                getListFromExcel = ReadExcelData(txtFilepath.Text);
+                dgEmployee.ItemsSource = dgEmployee.ItemsSource = getListFromExcel.Select(e => new
+                {
+                    FirstName = e.FirstName,
+                    LastName = e.LastName,
+                    Email = e.Email,
+                    Phone = e.Phone,
+                    DateOfBirth = e.DateOfBirth,
+                    Gender = (bool)e.Gender ? "Nam" : "Nữ",
+                    Address = e.Address,
+                    Salary = e.Salary,
+                    Department = e.DepartmentId,
+                    Manager = e.ManagerId,
+                    Position = e.PositionId,
+                });
+
+                dgEmployee.Visibility = Visibility.Visible;
+                btnAddmany.Visibility = Visibility.Visible;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message, "Thông báo");
+                return;
+            }
+        }
+
+        private void AddManyEmployee()
+        {
+            List<Employee> addError = new List<Employee>();
+            int countAdd = 0;
+            int countError = 0;
+            if (MessageBox.Show("Xác nhận thêm tất cả nhân viên mới?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                foreach (var employee in getListFromExcel)
+                {
+                    if (!CheckDuplicateEmail(employee.Email))
+                    {
+                        countError++;
+                        addError.Add(employee);
+                        continue;
+                    }
+                    employee.CreatedAt = DateOnly.FromDateTime(DateTime.Now);
+                    employee.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
+                    database.Employees.Add(employee);
+                    database.SaveChanges();
+                    Authentication auth = new Authentication();
+                    auth.EmployeeId = employee.Id;
+                    auth.Username = employee.Email;
+                    auth.PassWord = "12345678";
+                    auth.CreatedAt = DateOnly.FromDateTime(DateTime.Now);
+                    auth.UpdatedAt = DateOnly.FromDateTime(DateTime.Now);
+                    database.Authentications.Add(auth);
+                    if (database.SaveChanges() > 0)
+                    {
+                        countAdd++;
+                    }
+                }
+                if (countAdd == getListFromExcel.Count)
+                {
+                    MessageBox.Show("Thêm tất cả nhân viên thành công!", "Thông báo");
+                    return;
+                }
+                else
+                {
+                    if (MessageBox.Show("Thêm thành công " + countAdd + " nhân viên, Lỗi: " + countError + " do trùng Email, Xem danh sách lỗi?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    {
+                        dgEmployee.ItemsSource = addError.Select(e => new
+                        {
+                            FirstName = e.FirstName,
+                            LastName = e.LastName,
+                            Email = e.Email,
+                            Phone = e.Phone,
+                            DateOfBirth = e.DateOfBirth,
+                            Gender = (bool)e.Gender ? "Nam" : "Nữ",
+                            Address = e.Address,
+                            Salary = e.Salary,
+                            Department = e.DepartmentId,
+                            Manager = e.ManagerId,
+                            Position = e.PositionId,
+                        });
+                        btnAddmany.Visibility = Visibility.Collapsed;
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+            }
         }
     }
 }

@@ -47,7 +47,7 @@ namespace ManageEmployeeSystem
                 Description = d.Description,
                 CreatedAt = d.CreatedAt,
                 UpdatedAt = d.UpdatedAt,
-                Status = (bool) d.IsDelete ? "Ngừng hoạt động" : "Đang hoạt động",
+                Status = (bool)d.IsDelete ? "Ngừng hoạt động" : "Đang hoạt động",
             }).ToList();
             //var departmentData = database.Employees.Where(e => e.RoleId == 3).Include(d => d.Department).Select(d => new
             //{
@@ -231,10 +231,10 @@ namespace ManageEmployeeSystem
                 {
                     isDelete = true;
                 }
-                //DateOnly updatedAt = DateOnly.Parse(DateTime.Now());
-                if(cbbManager.SelectedItem != null)
+                //check trưởng phòng bị thay thế
+                if (cbbManager.SelectedItem != null)
                 {
-                    int idEmployee= 0;
+                    int idEmployee = 0;
                     var manager = cbbManager.SelectedItem as dynamic;
                     if (manager != null)
                     {
@@ -244,15 +244,15 @@ namespace ManageEmployeeSystem
                     var manageCurrent = database.Employees.FirstOrDefault(e => e.DepartmentId == departmentId && e.RoleId == 3); //trưởng phòng của phòng này
                     if (manageFuture != null && manageCurrent != null)
                     {
-                        if(manageFuture != manageCurrent && manageFuture.RoleId != 3) //nếu nhân viên được chọn không phải trưởng phỏng của phòng này và cũng không phải trưởng phòng 
+                        if (manageFuture != manageCurrent && manageFuture.RoleId != 3) //nếu nhân viên được chọn không phải trưởng phỏng của phòng này và cũng không phải trưởng phòng 
                         {
-                            if(MessageBox.Show("Thay thế trưởng phòng \"" + manageCurrent.FirstName + " " + manageCurrent.LastName + "\" thành \"" + manageFuture.FirstName + " " + manageFuture.LastName + "\"?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                            if (MessageBox.Show("Thay thế trưởng phòng \"" + manageCurrent.FirstName + " " + manageCurrent.LastName + "\" thành \"" + manageFuture.FirstName + " " + manageFuture.LastName + "\"?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                             {
                                 //Bãi nhiệm:
                                 manageCurrent.PositionId = null;
                                 manageCurrent.RoleId = 2; //role nhân viên
                                 manageCurrent.ManagerId = manageFuture.Id;
-                                database.Employees.Update(manageCurrent); 
+                                database.Employees.Update(manageCurrent);
 
                                 //Lên chức:
                                 manageFuture.DepartmentId = departmentId; //chuyển phòng
@@ -264,7 +264,7 @@ namespace ManageEmployeeSystem
                                 //tất cả nhân viên phòng hiện tại có quản lí mới
                                 var employeeOfDepart = database.Employees.Where(e => e.DepartmentId == departmentId).ToList();
                                 employeeOfDepart.ForEach(e => e.ManagerId = manageFuture.Id);
-                                employeeOfDepart.ForEach(e =>  database.Employees.Update(e));
+                                employeeOfDepart.ForEach(e => database.Employees.Update(e));
 
                             }
                             else
@@ -274,7 +274,7 @@ namespace ManageEmployeeSystem
                         }
                         else if (manageFuture != manageCurrent && manageFuture.RoleId == 3)// khác và cũng là trưởng phòng
                         {
-                            if(MessageBox.Show("\"" + manageFuture.FirstName + " " + manageFuture.LastName+"\" hiện đang là trưởng phòng của phòng của 1 phòng ban khác, xác nhận thay thế ?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                            if (MessageBox.Show("\"" + manageFuture.FirstName + " " + manageFuture.LastName + "\" hiện đang là trưởng phòng của phòng của 1 phòng ban khác, xác nhận thay thế ?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                             {
                                 //Bãi nhiệm:
                                 manageCurrent.PositionId = null;
@@ -297,13 +297,34 @@ namespace ManageEmployeeSystem
                                 var employeeOfDepart = database.Employees.Where(e => e.DepartmentId == departmentId).ToList();
                                 employeeOfDepart.ForEach(e => e.ManagerId = manageFuture.Id);
                                 employeeOfDepart.ForEach(e => database.Employees.Update(e));
-       
+
                             }
                             else
                             {
                                 return;
                             }
                         }
+                    }
+                }
+
+                if (isDelete == true)
+                {
+                    if (MessageBox.Show("Phòng ngừng hoạt động thì tất cả nhân viên sẽ ngừng hoạt động! Xác nhận cập nhật?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    {
+                        var employeeOfDepartment = database.Employees.Where(e => e.DepartmentId == departmentId).ToList();
+                        employeeOfDepartment.ForEach(e => e.IsDelete = true);
+                        employeeOfDepartment.ForEach(e => database.Employees.Update(e));
+                        database.SaveChanges();
+                    }
+                }
+                if(isDelete == false)
+                {
+                    if (MessageBox.Show("Bật trang thái hoạt động cho phòng này đồng thời bật trạng thái hoạt động cho nhân viên, Đồng ý?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    {
+                        var employeeOfDepartment = database.Employees.Where(e => e.DepartmentId == departmentId).ToList();
+                        employeeOfDepartment.ForEach(e => e.IsDelete = false);
+                        employeeOfDepartment.ForEach(e => database.Employees.Update(e));
+                        database.SaveChanges();
                     }
                 }
 
@@ -488,7 +509,7 @@ namespace ManageEmployeeSystem
                 if (department != null)
                 {
                     var employee = database.Employees.Where(e => e.DepartmentId == Id).ToList();
-                    var job = database.Jobs.Where(j =>j.DepartmentId == Id).ToList();
+                    var job = database.Jobs.Where(j => j.DepartmentId == Id).ToList();
                     if (employee.Count != 0)
                     {
                         if (MessageBox.Show("Xóa phòng " + department.Name + " sẽ làm cho các nhân viên hiện tại của phòng ban này không có phòng làm việc và xóa hết công việc của phòng này! Chắc chắn muốn xóa phòng " + department.Name + " ?", "Thông báo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)

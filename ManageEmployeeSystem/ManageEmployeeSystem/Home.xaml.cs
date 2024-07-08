@@ -24,6 +24,7 @@ namespace ManageEmployeeSystem
         public Home()
         {
             InitializeComponent();
+            
         }
         Employee em = new Employee();
         public Home(Employee employee)
@@ -60,18 +61,19 @@ namespace ManageEmployeeSystem
 
         private void Back_Click(object sender, RoutedEventArgs e)
         {
-            if (HomeBack.CanGoBack)
-            {
-                HomeBack.NavigationService.GoBack();
-            }
-            else
-            {
-                MessageBox.Show("Không có trang quay lại!", "Thông báo");
-            }
+            //if (HomeBack.CanGoBack)
+            //{
+            //    HomeBack.NavigationService.GoBack();
+            //}
+            //else
+            //{
+            //    MessageBox.Show("Không có trang quay lại!", "Thông báo");
+            //}
         }
 
         private void ProfileDetail_Click(object sender, RoutedEventArgs e)
         {
+            //ContentFrame.Navigate(new Userprofile());
             Userprofile userprofile = new Userprofile(em);
             this.Hide();
             userprofile.ShowDialog();
@@ -101,6 +103,37 @@ namespace ManageEmployeeSystem
             this.Hide();
             manageDepartment.ShowDialog();
             this.Close();
+        }
+
+        private void Navigation_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var listBox = sender as ListBox;
+            if (listBox.SelectedItem is ListBoxItem selectedItem)
+            {
+                switch (selectedItem.Content)
+                {
+                    case "Thông tin cá nhân":
+                        ContentFrame.Navigate(new Userprofile(em));
+                        break;
+                    case "Danh sách phòng ban":
+                        ContentFrame.Navigate(new ManageDepartment(em));
+                        break;
+                    case "Danh sách nhân viên":
+                        ContentFrame.Navigate(new ManageEmployee(em));
+                        break;
+                    case "Danh sách công việc":
+                        //SessionManager.Instance.CurrentUser = null;
+                        Login login = new Login();
+                        login.Show();
+                        Window.GetWindow(this).Close();
+                        break;
+                    case "Admin Dashboard":
+                        //AdminDashboard adminDashboard = new AdminDashboard();
+                        //adminDashboard.Show();
+                        //Window.GetWindow(this).Close();
+                        break;
+                }
+            }
         }
     }
 }

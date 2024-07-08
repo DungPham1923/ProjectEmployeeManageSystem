@@ -39,9 +39,9 @@
         
         <StackPanel Visibility="Collapsed" Name="addFromFile" Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="5,0,5,0">
             <Label Grid.ColumnSpan="5" HorizontalAlignment="Center" FontSize="20" Margin="5,0,5,0">File: </Label>
-            <TextBox FontSize="15" Height="30" Name="txtFilepath" Width="450" Margin="5,0,5,0"/>
-            <Button Content="Tải" Width="50" Height="30" FontSize="15" FontWeight="DemiBold" Margin="5,0,5,0"/>
-            <Button Content="Tệp" Width="50" Height="30" FontSize="15" FontWeight="DemiBold" Margin="5,0,5,0" Click="OpenFile_Click" />
+            <TextBox FontSize="15" Height="30" Name="txtFilepath" Width="200" Margin="5,0,5,0"/>
+            <Button Content="Tải" Width="50" Height="30" FontSize="15" FontWeight="DemiBold" Margin="5,0,5,0" Click="btnAddmanyFilePath_Click" />
+            <Button Content="Chọn tệp" Width="80" Height="30" FontSize="15" FontWeight="DemiBold" Margin="5,0,5,0" Click="OpenFile_Click" />
         </StackPanel>
         
 
