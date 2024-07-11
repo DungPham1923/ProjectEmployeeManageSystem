@@ -55,7 +55,12 @@ namespace ManageEmployeeSystem
             LoadDataJobStatus();
             LoadAssignBy();
             LoadEmployee();
+            CheckSuccessJobs();
 
+        }
+        private void CheckSuccessJobs()
+        {
+            
         }
 
         private void LoadEmployee()
@@ -98,7 +103,7 @@ namespace ManageEmployeeSystem
 
         private void LoadDataJobs()
         {
-            var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && j.IsDelete == false).Select(j => new
+            var empljob = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && j.IsDelete == false).Select(j => new
             {
                 ID = j.EmployeeJobId,
                 JobID = j.JobId,
@@ -111,12 +116,24 @@ namespace ManageEmployeeSystem
                 AssigmentDate = j.AssignmentDate,
                 Status = j.Job.JobStatus.Name,
             }).ToList();
-            dgEmployeeJobs.ItemsSource = job.ToList();
+            DateOnly dateNow = DateOnly.FromDateTime(DateTime.Now);
+            foreach(var j in empljob)
+            {
+                if(j.EndDate <= dateNow)
+                {
+                    var job = database.Jobs.SingleOrDefault( b => b.Id == j.JobID);
+                    if(job!=null)
+                    job.JobStatusId = 5;
+                    database.Jobs.Update(job);
+                    database.SaveChanges();
+                }
+            }
+            dgEmployeeJobs.ItemsSource = empljob.ToList();
         }
         private void LoadIndiJobs()
         {
             dgEmployeeJobs.ItemsSource = string.Empty;
-            var job = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && j.EmployeeId == em.Id && j.IsDelete == false).Select(j => new
+            var empljob = database.EmployeeJobs.Where(j => j.Job.DepartmentId == em.DepartmentId && j.EmployeeId == em.Id && j.IsDelete == false).Select(j => new
             {
                 ID = j.EmployeeJobId,
                 JobID = j.JobId,
@@ -129,7 +146,20 @@ namespace ManageEmployeeSystem
                 AssigmentDate = j.AssignmentDate,
                 Status = j.Job.JobStatus.Name,
             }).ToList();
-            dgEmployeeJobs.ItemsSource = job.ToList();
+            DateOnly dateNow = DateOnly.FromDateTime(DateTime.Now);
+            foreach (var j in empljob)
+            {
+                if (j.EndDate <= dateNow)
+                {
+                    var job = database.Jobs.SingleOrDefault(b => b.Id == j.JobID);
+                    if (job != null)
+                        job.JobStatusId = 5;
+                    database.Jobs.Update(job);
+                    database.SaveChanges();
+                }
+            }
+
+            dgEmployeeJobs.ItemsSource = empljob.ToList();
         }
         private void LoadDataJobStatus()
         {
@@ -349,8 +379,13 @@ namespace ManageEmployeeSystem
                     MessageBox.Show("Không tồn tại EmployeeJobID!", "Thông báo");
                     return;
                 }
-
+                DateOnly dateNow = DateOnly.FromDateTime(DateTime.Now);
                 DateOnly assignmentDate = DateOnly.FromDateTime(txtAssignDate.SelectedDate.Value);
+                if(assignmentDate < dateNow)
+                {
+                    MessageBox.Show("Chọn ngày không hợp lệ", "Thông báo") ;
+                    return;
+                }
                 int idEmployee = (int)cbbSelectEmployee.SelectedValue;
 
                 //Data bảng jobs:
@@ -368,7 +403,11 @@ namespace ManageEmployeeSystem
 
                 DateOnly startDate = DateOnly.FromDateTime(txtStartDate.SelectedDate.Value);
                 DateOnly endDate = DateOnly.FromDateTime(txtEndDate.SelectedDate.Value);
-
+                if (endDate < dateNow)
+                {
+                    MessageBox.Show("Chọn ngày không hợp lệ", "Thông báo");
+                    return;
+                }
 
                 if (string.IsNullOrWhiteSpace(jobName))
                 {

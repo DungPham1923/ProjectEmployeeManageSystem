@@ -70,6 +70,18 @@ namespace ManageEmployeeSystem
                 btnReset.Visibility = Visibility.Visible;
                 addFromFile.Visibility = Visibility.Collapsed;
                 txtSalary.IsReadOnly = false;
+
+                lbInfoLogin.Visibility = Visibility.Collapsed;
+                lbUsername.Visibility = Visibility.Collapsed;
+                lbOldpass.Visibility = Visibility.Collapsed;
+                lbNewpass.Visibility = Visibility.Collapsed;
+                lbRepass.Visibility = Visibility.Collapsed;
+                txtUsername.Visibility = Visibility.Collapsed;
+                txtOldpassword.Visibility = Visibility.Collapsed;
+                txtNewpassword.Visibility = Visibility.Collapsed;
+                txtRepassword.Visibility = Visibility.Collapsed;
+                btnRepass.Visibility = Visibility.Collapsed;
+                btnReset.Visibility = Visibility.Collapsed;
             }
             else
             {
@@ -884,7 +896,6 @@ namespace ManageEmployeeSystem
                 MessageBox.Show("Lỗi xóa nhân viên không thành công!", "Thông báo");
             }
         }
-
         private void GoBack_Click(object sender, RoutedEventArgs e)
         {
             if (employeeAdmin != null)
